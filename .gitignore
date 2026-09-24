@@ -1,0 +1,21 @@
+# Dependências e build
+node_modules/
+dist/
+build/
+coverage/
+*.tsbuildinfo
+
+# Ambiente
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+npm-debug.log*
+
+# SO / editor
+.DS_Store
+.idea/
+.vscode/*
+!.vscode/extensions.json
