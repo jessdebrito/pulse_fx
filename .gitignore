@@ -2,6 +2,7 @@
 node_modules/
 dist/
 build/
+apps/api/src/generated/
 coverage/
 *.tsbuildinfo
 
@@ -19,3 +20,6 @@ npm-debug.log*
 .idea/
 .vscode/*
 !.vscode/extensions.json
+
+.claude/
+CLAUDE.md

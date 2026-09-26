@@ -1,0 +1,43 @@
+{
+  "name": "@pulse-fx/api",
+  "version": "0.1.0",
+  "private": true,
+  "description": "API do Pulse FX — Express + Prisma ORM + PostgreSQL",
+  "scripts": {
+    "dev": "prisma migrate deploy && tsx watch src/main.ts",
+    "typecheck": "tsc -p tsconfig.json",
+    "lint": "eslint .",
+    "test": "jest",
+    "test:integration": "NODE_OPTIONS=--experimental-vm-modules jest -c jest.integration.config.js --runInBand",
+    "postinstall": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:deploy": "prisma migrate deploy",
+    "db:studio": "prisma studio"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "express": "^5.2.1",
+    "node-cron": "^4.6.0",
+    "pg": "^8.23.0",
+    "pino": "^10.3.1",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "@eslint/js": "^10.0.1",
+    "@types/express": "^5.0.6",
+    "@types/jest": "^30.0.0",
+    "@types/node": "^24.13.6",
+    "@types/pg": "^8.23.1",
+    "@types/supertest": "^7.2.1",
+    "@typescript/typescript6": "^6.0.2",
+    "eslint": "^10.11.0",
+    "jest": "^30.5.2",
+    "prisma": "^7.10.0",
+    "supertest": "^7.3.0",
+    "ts-jest": "^29.4.13",
+    "tsx": "^4.23.15",
+    "typescript": "^6.0.3",
+    "typescript-eslint": "^8.70.1"
+  }
+}

@@ -1,0 +1,71 @@
+name: pulse-fx
+
+x-node-service: &node-service
+  image: node:24-alpine
+  user: "${UID:-1000}:${GID:-1000}"
+  working_dir: /app
+  volumes:
+    - .:/app
+  environment: &node-env
+    HOME: /tmp
+    NPM_CONFIG_UPDATE_NOTIFIER: "false"
+
+services:
+  workspace:
+    <<: *node-service
+    command: ["npm", "install", "--no-audit", "--no-fund"]
+    environment:
+      <<: *node-env
+      DATABASE_URL: postgres://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@db:5432/${POSTGRES_DB:-pulse_fx}
+      TEST_DATABASE_URL: postgres://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@db:5432/${POSTGRES_DB:-pulse_fx}_test
+
+  db:
+    image: postgres:18-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-pulse}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-pulse}
+      POSTGRES_DB: ${POSTGRES_DB:-pulse_fx}
+    ports:
+      - "${DB_PORT:-5432}:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U $${POSTGRES_USER} -d $${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  api:
+    <<: *node-service
+    command: ["npm", "run", "dev", "-w", "apps/api"]
+    environment:
+      <<: *node-env
+      DATABASE_URL: postgres://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@db:5432/${POSTGRES_DB:-pulse_fx}
+      PORT: "4000"
+      SYNC_OPENING_CRON: ${SYNC_OPENING_CRON:-15 10 * * 1-5}
+      SYNC_CLOSING_CRON: ${SYNC_CLOSING_CRON:-15 13 * * 1-5}
+      LOG_LEVEL: ${LOG_LEVEL:-info}
+    ports:
+      - "${API_PORT:-4000}:4000"
+    depends_on:
+      workspace:
+        condition: service_completed_successfully
+      db:
+        condition: service_healthy
+
+  web:
+    <<: *node-service
+    command: ["npm", "run", "dev", "-w", "apps/web"]
+    environment:
+      <<: *node-env
+      API_PROXY_TARGET: http://api:4000
+    ports:
+      - "${WEB_PORT:-3000}:3000"
+    depends_on:
+      workspace:
+        condition: service_completed_successfully
+      api:
+        condition: service_started
+
+volumes:
+  pgdata:
