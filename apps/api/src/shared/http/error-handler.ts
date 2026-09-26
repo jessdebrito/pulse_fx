@@ -5,6 +5,7 @@ import type { AppLogger } from '../logger';
 const HTTP_STATUS_BY_ERROR_CODE: Readonly<Record<string, number>> = Object.freeze({
   INVALID_VALUE: 400,
   CURRENCY_NOT_FOUND: 404,
+  INDICATOR_NOT_FOUND: 404,
 });
 
 const INTERNAL_ERROR_STATUS = 500;

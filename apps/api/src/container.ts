@@ -3,7 +3,7 @@ import { createApp } from './app';
 import type { AppConfig } from './config/env';
 import { createDatabaseClient, type DatabaseClient } from './database/client';
 import { CurrenciesService, PrismaCurrencyQuoteRepository, PrismaCurrencyRepository } from './modules/currencies';
-import { PrismaIndicatorObservationRepository, PrismaIndicatorRepository } from './modules/indicators';
+import { IndicatorsService, PrismaIndicatorObservationRepository, PrismaIndicatorRepository } from './modules/indicators';
 import { IndicatorSyncService, SyncService } from './modules/sync';
 import { PrismaIndicatorSyncStateRepository } from './modules/sync/indicator-sync-state.repository';
 import { BcbPtaxClient } from './modules/sync/sources/bcb-ptax.client';
@@ -50,6 +50,10 @@ export function createContainer(config: AppConfig): Container {
     lock: new PgAdvisorySyncLock(database.pool, INDICATOR_SYNC_ADVISORY_LOCK_KEY),
     clock,
   });
-  const app = createApp({ logger, currenciesService: new CurrenciesService({ currencies, quotes }) });
+  const app = createApp({
+    logger,
+    currenciesService: new CurrenciesService({ currencies, quotes }),
+    indicatorsService: new IndicatorsService({ indicators, observations }),
+  });
   return { app, database, syncService, indicatorSyncService, logger };
 }
