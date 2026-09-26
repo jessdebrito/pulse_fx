@@ -3,16 +3,18 @@ import { InvalidValueError } from '../../../src/shared/errors/invalid-value-erro
 
 const REQUIRED = {
   DATABASE_URL: 'postgres://pulse:pulse@db:5432/pulse_fx',
+  FRED_API_KEY: '0123456789abcdef0123456789abcdef',
 };
 
 describe('loadConfig', () => {
-  it('should apply defaults when only DATABASE_URL is set', () => {
+  it('should apply defaults when only the required variables are set', () => {
     expect(loadConfig(REQUIRED)).toEqual({
       databaseUrl: REQUIRED.DATABASE_URL,
       port: 4000,
       syncOpeningCron: '15 10 * * 1-5',
       syncClosingCron: '15 13 * * 1-5',
       logLevel: 'info',
+      fredApiKey: REQUIRED.FRED_API_KEY,
     });
   });
 
@@ -32,10 +34,25 @@ describe('loadConfig', () => {
   });
 
   it('should throw InvalidValueError naming the variable when DATABASE_URL is missing', () => {
-    const load = (): unknown => loadConfig({});
+    const load = (): unknown => loadConfig({ FRED_API_KEY: REQUIRED.FRED_API_KEY });
 
     expect(load).toThrow(InvalidValueError);
     expect(load).toThrow(/DATABASE_URL/);
+  });
+
+  it('should throw InvalidValueError naming the variable when FRED_API_KEY is missing', () => {
+    const load = (): unknown => loadConfig({ DATABASE_URL: REQUIRED.DATABASE_URL });
+
+    expect(load).toThrow(InvalidValueError);
+    expect(load).toThrow(/FRED_API_KEY/);
+  });
+
+  it('should reject a FRED_API_KEY that is not a FRED key without echoing its value', () => {
+    const load = (): unknown => loadConfig({ ...REQUIRED, FRED_API_KEY: 'NOT-A-VALID-FRED-KEY' });
+
+    expect(load).toThrow(InvalidValueError);
+    expect(load).toThrow(/FRED_API_KEY/);
+    expect(load).not.toThrow(/NOT-A-VALID-FRED-KEY/);
   });
 
   it('should return a frozen object when the config is valid', () => {

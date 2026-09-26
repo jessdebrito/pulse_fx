@@ -1,5 +1,5 @@
 import { CalendarDate } from '../../../../src/shared/calendar-date';
-import { initialSyncState, syncStartDate, yearChunks } from '../../../../src/modules/sync/sync-policy.rules';
+import { initialIndicatorSyncState, initialSyncState, syncStartDate, yearChunks } from '../../../../src/modules/sync/sync-policy.rules';
 
 const TODAY = CalendarDate.fromIso('2026-09-25');
 
@@ -7,6 +7,20 @@ describe('initialSyncState', () => {
   it('should have no attempts, successes or observations when created', () => {
     expect(initialSyncState('USD')).toEqual({
       currencyCode: 'USD',
+      lastAttemptAt: null,
+      lastSuccessAt: null,
+      lastStatus: null,
+      lastError: null,
+      lastObservationDate: null,
+    });
+  });
+});
+
+describe('initialIndicatorSyncState', () => {
+  it('should have no attempts, successes or observations when created for an indicator', () => {
+    expect(initialIndicatorSyncState({ source: 'fred', code: 'IMP3510' })).toEqual({
+      source: 'fred',
+      code: 'IMP3510',
       lastAttemptAt: null,
       lastSuccessAt: null,
       lastStatus: null,
@@ -27,6 +41,11 @@ describe('syncStartDate', () => {
     expect(syncStartDate(state, TODAY).toString()).toBe('2026-09-22');
   });
 
+  it('should start on the last stored observation date when an indicator already has data', () => {
+    const state = { ...initialIndicatorSyncState({ source: 'sgs', code: '27574' }), lastObservationDate: CalendarDate.fromIso('2026-08-01') };
+
+    expect(syncStartDate(state, TODAY).toString()).toBe('2026-08-01');
+  });
 });
 
 describe('yearChunks', () => {

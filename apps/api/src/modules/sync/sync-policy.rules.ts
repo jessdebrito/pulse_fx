@@ -1,8 +1,9 @@
 import { CalendarDate } from '../../shared/calendar-date';
+import type { IndicatorKey } from '../indicators';
 import { INITIAL_LOAD_DAYS_BACK } from './sync.constants';
 
 const YEAR_LENGTH = 4;
-import type { CalendarRange, SyncState } from './sync.types';
+import type { CalendarRange, IndicatorSyncState, SyncState } from './sync.types';
 
 export function initialSyncState(currencyCode: string): SyncState {
   return {
@@ -15,7 +16,19 @@ export function initialSyncState(currencyCode: string): SyncState {
   };
 }
 
-export function syncStartDate(state: SyncState, today: CalendarDate): CalendarDate {
+export function initialIndicatorSyncState(key: IndicatorKey): IndicatorSyncState {
+  return {
+    source: key.source,
+    code: key.code,
+    lastAttemptAt: null,
+    lastSuccessAt: null,
+    lastStatus: null,
+    lastError: null,
+    lastObservationDate: null,
+  };
+}
+
+export function syncStartDate(state: Pick<SyncState, 'lastObservationDate'>, today: CalendarDate): CalendarDate {
   return state.lastObservationDate ?? today.addDays(-INITIAL_LOAD_DAYS_BACK);
 }
 

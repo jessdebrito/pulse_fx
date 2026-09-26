@@ -8,7 +8,7 @@ const SEP_23 = CalendarDate.fromIso('2026-09-23');
 const SEP_24 = CalendarDate.fromIso('2026-09-24');
 
 function clientReturning(payload: unknown): BcbPtaxClient {
-  const http: HttpClient = { getJson: () => Promise.resolve(payload) };
+  const http: HttpClient = { getJson: () => Promise.resolve(payload), postText: jest.fn() };
   return new BcbPtaxClient(http);
 }
 

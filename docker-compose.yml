@@ -18,6 +18,7 @@ services:
       <<: *node-env
       DATABASE_URL: postgres://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@db:5432/${POSTGRES_DB:-pulse_fx}
       TEST_DATABASE_URL: postgres://${POSTGRES_USER:-pulse}:${POSTGRES_PASSWORD:-pulse}@db:5432/${POSTGRES_DB:-pulse_fx}_test
+      FRED_API_KEY: ${FRED_API_KEY:-}
 
   db:
     image: postgres:18-alpine
@@ -45,6 +46,7 @@ services:
       SYNC_OPENING_CRON: ${SYNC_OPENING_CRON:-15 10 * * 1-5}
       SYNC_CLOSING_CRON: ${SYNC_CLOSING_CRON:-15 13 * * 1-5}
       LOG_LEVEL: ${LOG_LEVEL:-info}
+      FRED_API_KEY: ${FRED_API_KEY:-}
     ports:
       - "${API_PORT:-4000}:4000"
     depends_on:

@@ -1,0 +1,23 @@
+{
+  "realtime_start": "2026-07-31",
+  "realtime_end": "2026-07-31",
+  "seriess": [
+    {
+      "id": "B235RC1Q027SBEA",
+      "realtime_start": "2026-07-31",
+      "realtime_end": "2026-07-31",
+      "title": "Federal government current tax receipts: Taxes on production and imports: Customs duties",
+      "observation_start": "1959-01-01",
+      "observation_end": "2026-04-01",
+      "frequency": "Quarterly",
+      "frequency_short": "Q",
+      "units": "Billions of Dollars",
+      "units_short": "Bil. of $",
+      "seasonal_adjustment": "Seasonally Adjusted Annual Rate",
+      "seasonal_adjustment_short": "SAAR",
+      "last_updated": "2026-07-30 10:08:51-05",
+      "popularity": 55,
+      "notes": "BEA Account Code: B235RC\n\nFor more information about this series, please see http://www.bea.gov/national/."
+    }
+  ]
+}

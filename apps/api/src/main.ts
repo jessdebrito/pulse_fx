@@ -6,18 +6,15 @@ import { APP_TIME_ZONE } from './shared/clock';
 
 function main(): void {
   const config = loadConfig(process.env);
-  const { app, database, syncService, logger } = createContainer(config);
+  const { app, database, syncService, indicatorSyncService, logger } = createContainer(config);
 
   const server = app.listen(config.port, () => {
     logger.info({ port: config.port }, 'API listening');
   });
 
-  startSyncScheduler({
-    expressions: [config.syncOpeningCron, config.syncClosingCron],
-    timeZone: APP_TIME_ZONE,
-    service: syncService,
-    logger,
-  });
+  const expressions = [config.syncOpeningCron, config.syncClosingCron];
+  startSyncScheduler({ expressions, timeZone: APP_TIME_ZONE, service: syncService, logger });
+  startSyncScheduler({ expressions, timeZone: APP_TIME_ZONE, service: indicatorSyncService, logger });
   void runInitialLoad(syncService, logger);
 
   const shutdown = (): void => {

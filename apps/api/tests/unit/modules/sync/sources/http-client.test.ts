@@ -41,6 +41,44 @@ describe('FetchHttpClient', () => {
     expect(fetchFunction).toHaveBeenCalledTimes(3);
   });
 
+  it('should return the body without retrying when the status is one of the accepted statuses', async () => {
+    const notFound = { erro: { statusCode: 404, detail: 'Value(s) not found' } };
+    const fetchFunction = jest.fn<Promise<Response>, Parameters<FetchFunction>>().mockResolvedValue(jsonResponse(notFound, 404));
+
+    await expect(buildClient(fetchFunction).getJson(URL, { acceptedStatuses: [404] })).resolves.toEqual(notFound);
+    expect(fetchFunction).toHaveBeenCalledTimes(1);
+  });
+
+  it('should hide the api_key value in the error message when a request with an api key fails', async () => {
+    const fetchFunction = jest.fn<Promise<Response>, Parameters<FetchFunction>>().mockImplementation(() => Promise.resolve(jsonResponse({}, 400)));
+    const url = 'https://example.test/fred/series?series_id=IMP3510&api_key=secretkey123&file_type=json';
+
+    const failure = await buildClient(fetchFunction).getJson(url).catch((reason: unknown) => reason);
+
+    expect(failure).toBeInstanceOf(ExternalSourceError);
+    const error = failure as ExternalSourceError;
+    const causeMessage = error.cause instanceof Error ? error.cause.message : '';
+    expect(`${error.message} ${causeMessage}`).not.toContain('secretkey123');
+    expect(error.message).toContain('api_key=***');
+  });
+
+  it('should post the body with the given headers and return the response text when the response is 200', async () => {
+    const fetchFunction = jest.fn<Promise<Response>, Parameters<FetchFunction>>().mockResolvedValue(new Response('<ok/>', { status: 200 }));
+
+    await expect(buildClient(fetchFunction).postText(URL, '<request/>', { 'content-type': 'text/xml' })).resolves.toBe('<ok/>');
+    const init = fetchFunction.mock.calls[0]?.[1];
+    expect(init?.method).toBe('POST');
+    expect(init?.body).toBe('<request/>');
+    expect(init?.headers).toEqual({ 'content-type': 'text/xml' });
+  });
+
+  it('should throw ExternalSourceError after retrying when every POST attempt returns a non-2xx status', async () => {
+    const fetchFunction = jest.fn<Promise<Response>, Parameters<FetchFunction>>().mockImplementation(() => Promise.resolve(new Response('fault', { status: 500 })));
+
+    await expect(buildClient(fetchFunction).postText(URL, '<request/>', {})).rejects.toThrow(ExternalSourceError);
+    expect(fetchFunction).toHaveBeenCalledTimes(3);
+  });
+
   it('should abort the request and throw ExternalSourceError when the server takes longer than the timeout', async () => {
     const neverAnswers: FetchFunction = (_url, init) =>
       new Promise((_resolve, reject) => {

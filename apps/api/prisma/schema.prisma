@@ -67,3 +67,57 @@ model SyncState {
 
   @@map("sync_state")
 }
+
+enum IndicatorSource {
+  fred
+  sgs
+
+  @@map("indicator_source")
+}
+
+enum IndicatorFrequency {
+  daily
+  weekly
+  monthly
+  quarterly
+  annual
+
+  @@map("indicator_frequency")
+}
+
+model Indicator {
+  source       IndicatorSource
+  code         String
+  name         String
+  unit         String
+  frequency    IndicatorFrequency
+  observations IndicatorObservation[]
+
+  @@id([source, code])
+  @@map("indicators")
+}
+
+model IndicatorObservation {
+  source          IndicatorSource
+  code            String
+  observationDate DateTime        @map("observation_date") @db.Date
+  value           Decimal
+  fetchedAt       DateTime        @default(now()) @map("fetched_at") @db.Timestamptz(3)
+  indicator       Indicator       @relation(fields: [source, code], references: [source, code])
+
+  @@id([source, code, observationDate])
+  @@map("indicator_observations")
+}
+
+model IndicatorSyncState {
+  source              IndicatorSource
+  code                String
+  lastAttemptAt       DateTime?       @map("last_attempt_at") @db.Timestamptz(3)
+  lastSuccessAt       DateTime?       @map("last_success_at") @db.Timestamptz(3)
+  lastStatus          SyncStatus?     @map("last_status")
+  lastError           String?         @map("last_error")
+  lastObservationDate DateTime?       @map("last_observation_date") @db.Date
+
+  @@id([source, code])
+  @@map("indicator_sync_state")
+}

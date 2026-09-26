@@ -1,8 +1,13 @@
 import { setTimeout as delay } from 'node:timers/promises';
 import { ExternalSourceError } from '../sync.errors';
 
+export interface GetJsonOptions {
+  readonly acceptedStatuses?: readonly number[];
+}
+
 export interface HttpClient {
-  getJson(url: string): Promise<unknown>;
+  getJson(url: string, options?: GetJsonOptions): Promise<unknown>;
+  postText(url: string, body: string, headers: Readonly<Record<string, string>>): Promise<string>;
 }
 
 export type FetchFunction = (url: string, init: RequestInit) => Promise<Response>;
@@ -17,6 +22,9 @@ export interface FetchHttpClientOptions {
   readonly sleep?: SleepFunction;
 }
 
+const SECRET_QUERY_PARAMETER_PATTERN = /([?&]api_key=)[^&]*/g;
+const REDACTED_VALUE = '***';
+
 export class FetchHttpClient implements HttpClient {
   private readonly fetchFunction: FetchFunction;
   private readonly sleep: SleepFunction;
@@ -26,28 +34,45 @@ export class FetchHttpClient implements HttpClient {
     this.sleep = options.sleep ?? ((milliseconds): Promise<void> => delay(milliseconds));
   }
 
-  async getJson(url: string): Promise<unknown> {
-    let lastError: unknown;
-    for (let attempt = 1; attempt <= this.options.maxAttempts; attempt += 1) {
-      try {
-        return await this.requestOnce(url);
-      } catch (error) {
-        lastError = error;
-        if (attempt < this.options.maxAttempts) await this.sleep(this.options.retryDelayMs);
-      }
-    }
-    throw new ExternalSourceError(`GET ${url} failed after ${this.options.maxAttempts} attempts`, { cause: lastError });
+  getJson(url: string, options: GetJsonOptions = {}): Promise<unknown> {
+    const request = `GET ${redactSecrets(url)}`;
+    return this.withRetry(request, async () => {
+      const response = await this.send(request, url, { headers: { accept: 'application/json' } }, options.acceptedStatuses ?? []);
+      const body: unknown = await response.json();
+      return body;
+    });
   }
 
-  private async requestOnce(url: string): Promise<unknown> {
-    const response = await this.fetchFunction(url, {
-      headers: { accept: 'application/json' },
-      signal: AbortSignal.timeout(this.options.timeoutMs),
+  postText(url: string, body: string, headers: Readonly<Record<string, string>>): Promise<string> {
+    const request = `POST ${redactSecrets(url)}`;
+    return this.withRetry(request, async () => {
+      const response = await this.send(request, url, { method: 'POST', headers: { ...headers }, body }, []);
+      return response.text();
     });
-    if (!response.ok) {
-      throw new ExternalSourceError(`GET ${url} responded with HTTP ${response.status}`);
-    }
-    const body: unknown = await response.json();
-    return body;
   }
+
+  private async withRetry<T>(request: string, attempt: () => Promise<T>): Promise<T> {
+    let lastError: unknown;
+    for (let attemptNumber = 1; attemptNumber <= this.options.maxAttempts; attemptNumber += 1) {
+      try {
+        return await attempt();
+      } catch (error) {
+        lastError = error;
+        if (attemptNumber < this.options.maxAttempts) await this.sleep(this.options.retryDelayMs);
+      }
+    }
+    throw new ExternalSourceError(`${request} failed after ${this.options.maxAttempts} attempts`, { cause: lastError });
+  }
+
+  private async send(request: string, url: string, init: RequestInit, acceptedStatuses: readonly number[]): Promise<Response> {
+    const response = await this.fetchFunction(url, { ...init, signal: AbortSignal.timeout(this.options.timeoutMs) });
+    if (!response.ok && !acceptedStatuses.includes(response.status)) {
+      throw new ExternalSourceError(`${request} responded with HTTP ${response.status}`);
+    }
+    return response;
+  }
+}
+
+function redactSecrets(url: string): string {
+  return url.replace(SECRET_QUERY_PARAMETER_PATTERN, `$1${REDACTED_VALUE}`);
 }

@@ -39,6 +39,10 @@ export class RecordedPtaxHttpClient implements HttpClient {
     }
   }
 
+  postText(url: string): Promise<string> {
+    return Promise.reject(new Error(`PTAX is never called with POST (${url})`));
+  }
+
   quoteUrlsFor(currencyCode: string): string[] {
     return this.requestedUrls.filter((url) => url.includes(`@moeda='${currencyCode}'`));
   }

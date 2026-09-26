@@ -5,10 +5,14 @@ import type { SyncRunner } from './sync.service';
 
 export type ScheduleFunction = (expression: string, task: () => Promise<void>, timeZone: string) => unknown;
 
+export interface ScheduledSync {
+  run(): Promise<object>;
+}
+
 export interface SyncSchedulerOptions {
   readonly expressions: readonly string[];
   readonly timeZone: string;
-  readonly service: SyncRunner;
+  readonly service: ScheduledSync;
   readonly logger: AppLogger;
   readonly schedule?: ScheduleFunction;
 }
@@ -22,7 +26,7 @@ export function startSyncScheduler(options: SyncSchedulerOptions): void {
   }
 }
 
-export async function runScheduledSync(service: SyncRunner, logger: AppLogger): Promise<void> {
+export async function runScheduledSync(service: ScheduledSync, logger: AppLogger): Promise<void> {
   try {
     const report = await service.run();
     logger.info({ report }, 'Scheduled sync finished');
