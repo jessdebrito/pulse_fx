@@ -26,7 +26,7 @@ function fakeLogger(): LoggerSpies {
 }
 
 function fakeService(overrides: Partial<SyncRunner> = {}): SyncRunner {
-  return { run: jest.fn().mockResolvedValue(REPORT), runInitialLoad: jest.fn().mockResolvedValue(REPORT), ...overrides };
+  return { run: jest.fn().mockResolvedValue(REPORT), runInitialLoad: jest.fn().mockResolvedValue(REPORT), backfill: jest.fn().mockResolvedValue(REPORT), ...overrides };
 }
 
 describe('startSyncScheduler', () => {

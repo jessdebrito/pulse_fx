@@ -154,3 +154,62 @@ describe('SyncService.runInitialLoad', () => {
     expect(http.requestedUrls).toHaveLength(requestsBefore);
   });
 });
+
+describe('SyncService.backfill', () => {
+  const FROM = CalendarDate.fromIso('2025-12-30');
+  const TO = CalendarDate.fromIso('2026-01-02');
+  const YEAR_BOUNDARY_RECORDINGS: PtaxRecordings = { periods: ['2025-12-30-to-2025-12-31', '2026-01-01-to-2026-01-02'] };
+
+  async function backfillSetup(recordings: PtaxRecordings = YEAR_BOUNDARY_RECORDINGS, codes: readonly string[] = ['USD']): Promise<ReturnType<typeof setup>> {
+    const context = setup(recordings);
+    await context.currencies.upsertMany(await recordedCurrencies(...codes));
+    return context;
+  }
+
+  it('should fetch each calendar year of the range separately and store every real bulletin of the stored catalog', async () => {
+    const { service, http, quotes } = await backfillSetup();
+
+    const report = await service.backfill(FROM, TO);
+
+    expect(http.quoteUrlsFor('USD')).toHaveLength(2);
+    expect(http.requestedUrls.some((url) => url.includes('/Moedas?'))).toBe(false);
+    expect(report.results).toEqual([{ currencyCode: 'USD', status: 'synced', upserted: 12 }]);
+    expect(new Set(quotes.quotesOf('USD').map((quote) => quote.quoteDate.toString()))).toEqual(new Set(['2025-12-30', '2025-12-31', '2026-01-02']));
+  });
+
+  it('should set the last observation date when the currency had no data', async () => {
+    const { service, syncStates } = await backfillSetup();
+
+    await service.backfill(FROM, TO);
+
+    expect(syncStates.find('USD')).toMatchObject({ lastStatus: 'success', lastObservationDate: CalendarDate.fromIso('2026-01-02') });
+  });
+
+  it('should keep the most recent observation date when backfilling older data', async () => {
+    const { service, syncStates } = await backfillSetup();
+    await syncStates.save(syncedState('USD', '2026-09-24'));
+
+    await service.backfill(FROM, TO);
+
+    expect(syncStates.find('USD')?.lastObservationDate?.toString()).toBe('2026-09-24');
+  });
+
+  it('should record the failure and continue with the next currency when a request fails', async () => {
+    const { service, syncStates } = await backfillSetup({ ...YEAR_BOUNDARY_RECORDINGS, failures: { EUR: new ExternalSourceError('BCB timeout') } }, ['EUR', 'USD']);
+
+    const report = await service.backfill(FROM, TO);
+
+    expect(report.results).toEqual([
+      { currencyCode: 'EUR', status: 'failed', upserted: 0, error: 'BCB timeout' },
+      { currencyCode: 'USD', status: 'synced', upserted: 12 },
+    ]);
+    expect(syncStates.find('EUR')).toMatchObject({ lastStatus: 'failure', lastError: 'BCB timeout' });
+  });
+
+  it('should throw SyncInProgressError when another sync holds the lock', async () => {
+    const { service, lock } = await backfillSetup();
+    lock.isHeldElsewhere = true;
+
+    await expect(service.backfill(FROM, TO)).rejects.toThrow(SyncInProgressError);
+  });
+});

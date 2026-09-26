@@ -3,7 +3,9 @@ import { join } from 'node:path';
 import type { HttpClient } from '../../../../src/modules/sync/sources/http-client';
 
 export type RecordedPeriod =
+  | '2025-12-30-to-2025-12-31'
   | '2025-12-30-to-2026-01-02'
+  | '2026-01-01-to-2026-01-02'
   | '2026-09-19-to-2026-09-20'
   | '2026-09-22-to-2026-09-24'
   | '2026-09-23-to-2026-09-24';

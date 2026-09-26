@@ -2,6 +2,11 @@ import type { CalendarDate } from '../../shared/calendar-date';
 
 export type SyncStatus = 'success' | 'failure';
 
+export interface CalendarRange {
+  readonly from: CalendarDate;
+  readonly to: CalendarDate;
+}
+
 export interface SyncState {
   readonly currencyCode: string;
   readonly lastAttemptAt: Date | null;
@@ -30,5 +35,13 @@ export interface SyncReportDto {
   readonly startedAt: string;
   readonly finishedAt: string;
   readonly catalog: CatalogSyncResultDto;
+  readonly results: readonly QuoteSyncResultDto[];
+}
+
+export interface BackfillReportDto {
+  readonly startedAt: string;
+  readonly finishedAt: string;
+  readonly from: string;
+  readonly to: string;
   readonly results: readonly QuoteSyncResultDto[];
 }

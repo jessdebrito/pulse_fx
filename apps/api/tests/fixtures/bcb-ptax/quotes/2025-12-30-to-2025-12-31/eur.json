@@ -1,0 +1,61 @@
+{
+  "@odata.context": "https://was-p.bcnet.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata$metadata#_CotacaoMoedaPeriodo(paridadeCompra,paridadeVenda,cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim)",
+  "value": [
+    {
+      "paridadeCompra": 1.176,
+      "paridadeVenda": 1.1762,
+      "cotacaoCompra": 6.4916,
+      "cotacaoVenda": 6.4934,
+      "dataHoraCotacao": "2025-12-30 10:10:25.266",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.1762,
+      "paridadeVenda": 1.1765,
+      "cotacaoCompra": 6.465,
+      "cotacaoVenda": 6.4673,
+      "dataHoraCotacao": "2025-12-30 11:11:25.981",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.1762,
+      "paridadeVenda": 1.1764,
+      "cotacaoCompra": 6.4673,
+      "cotacaoVenda": 6.4691,
+      "dataHoraCotacao": "2025-12-30 12:10:27.835",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.1759,
+      "paridadeVenda": 1.176,
+      "cotacaoCompra": 6.458,
+      "cotacaoVenda": 6.4593,
+      "dataHoraCotacao": "2025-12-30 13:12:00.334",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.1759,
+      "paridadeVenda": 1.176,
+      "cotacaoCompra": 6.4696,
+      "cotacaoVenda": 6.4708,
+      "dataHoraCotacao": "2025-12-30 13:12:00.341",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 1.1756,
+      "paridadeVenda": 1.1757,
+      "cotacaoCompra": 6.4679,
+      "cotacaoVenda": 6.4692,
+      "dataHoraCotacao": "2025-12-31 10:06:24.179",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.1756,
+      "paridadeVenda": 1.1757,
+      "cotacaoCompra": 6.4679,
+      "cotacaoVenda": 6.4692,
+      "dataHoraCotacao": "2025-12-31 10:06:24.183",
+      "tipoBoletim": "Fechamento"
+    }
+  ]
+}
