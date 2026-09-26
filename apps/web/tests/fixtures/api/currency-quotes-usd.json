@@ -1,0 +1,99 @@
+{
+  "code": "USD",
+  "name": "Dólar dos Estados Unidos",
+  "type": "A",
+  "from": "2026-01-01",
+  "to": "2026-09-25",
+  "quotes": [
+    {
+      "quotedAt": "2026-09-24T10:05:12.142503-03:00",
+      "quoteDate": "2026-09-24",
+      "bulletin": "opening",
+      "bid": 5.1676,
+      "ask": 5.1682,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-24T11:05:11.049556-03:00",
+      "quoteDate": "2026-09-24",
+      "bulletin": "intermediate",
+      "bid": 5.171,
+      "ask": 5.1716,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-24T12:02:15.561312-03:00",
+      "quoteDate": "2026-09-24",
+      "bulletin": "intermediate",
+      "bid": 5.1824,
+      "ask": 5.183,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-24T13:03:18.602841-03:00",
+      "quoteDate": "2026-09-24",
+      "bulletin": "intermediate",
+      "bid": 5.1947,
+      "ask": 5.1953,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-24T13:03:18.656275-03:00",
+      "quoteDate": "2026-09-24",
+      "bulletin": "closing",
+      "bid": 5.1789,
+      "ask": 5.1795,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-25T10:09:12.649660-03:00",
+      "quoteDate": "2026-09-25",
+      "bulletin": "opening",
+      "bid": 5.198,
+      "ask": 5.1986,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-25T11:05:11.950802-03:00",
+      "quoteDate": "2026-09-25",
+      "bulletin": "intermediate",
+      "bid": 5.1986,
+      "ask": 5.1992,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-25T12:06:13.549371-03:00",
+      "quoteDate": "2026-09-25",
+      "bulletin": "intermediate",
+      "bid": 5.2066,
+      "ask": 5.2072,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-25T13:10:17.347800-03:00",
+      "quoteDate": "2026-09-25",
+      "bulletin": "intermediate",
+      "bid": 5.1906,
+      "ask": 5.1912,
+      "bidParity": 1,
+      "askParity": 1
+    },
+    {
+      "quotedAt": "2026-09-25T13:10:17.447657-03:00",
+      "quoteDate": "2026-09-25",
+      "bulletin": "closing",
+      "bid": 5.1985,
+      "ask": 5.1991,
+      "bidParity": 1,
+      "askParity": 1
+    }
+  ]
+}
