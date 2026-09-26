@@ -1,8 +1,11 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { PeriodPicker } from '../../../src/components/period-picker';
 import { recordedUsdPeriodsAcrossYears } from '../../support/api/recorded-currencies';
+import { recordedUsImportsFromBrazilPeriods } from '../../support/api/recorded-indicators';
 
 const available = recordedUsdPeriodsAcrossYears().periods;
+const indicatorPeriods = recordedUsImportsFromBrazilPeriods().periods;
+const INDICATOR_GRANULARITIES = ['year', 'history'] as const;
 
 function choose(comboboxName: string, optionName: string): void {
   fireEvent.mouseDown(screen.getByRole('combobox', { name: comboboxName }));
@@ -62,5 +65,29 @@ describe('PeriodPicker', () => {
     choose('Mês', 'Janeiro');
 
     expect(onChange).toHaveBeenCalledWith({ granularity: 'month', year: 2026, month: 1 });
+  });
+
+  it('should offer Anual and Histórico without Mensal when those are the granularities', () => {
+    render(<PeriodPicker available={indicatorPeriods} value={{ granularity: 'year', year: 2026 }} onChange={jest.fn()} granularities={INDICATOR_GRANULARITIES} />);
+
+    expect(screen.getByRole('button', { name: 'Anual', pressed: true })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Histórico', pressed: false })).toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: 'Mensal' })).not.toBeInTheDocument();
+  });
+
+  it('should switch to the full history of the data when the user clicks Histórico', () => {
+    const onChange = jest.fn();
+    render(<PeriodPicker available={indicatorPeriods} value={{ granularity: 'year', year: 2026 }} onChange={onChange} granularities={INDICATOR_GRANULARITIES} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Histórico' }));
+
+    expect(onChange).toHaveBeenCalledWith({ granularity: 'history', from: '2024-01', to: '2026-07' });
+  });
+
+  it('should hide the year list when the selection is the full history', () => {
+    render(<PeriodPicker available={indicatorPeriods} value={{ granularity: 'history', from: '2024-01', to: '2026-07' }} onChange={jest.fn()} granularities={INDICATOR_GRANULARITIES} />);
+
+    expect(screen.getByRole('button', { name: 'Histórico', pressed: true })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Ano' })).not.toBeInTheDocument();
   });
 });

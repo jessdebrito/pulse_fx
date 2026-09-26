@@ -1,7 +1,10 @@
 import { defaultSelection, monthLabel, monthShortLabel, periodAxis, rangeOfSelection, selectYear, switchGranularity } from '../../../src/lib/periods';
 import { recordedUsdPeriodsAcrossYears } from '../../support/api/recorded-currencies';
+import { recordedUsImportsFromBrazilPeriods } from '../../support/api/recorded-indicators';
 
 const available = recordedUsdPeriodsAcrossYears().periods;
+const monthlyIndicatorPeriods = recordedUsImportsFromBrazilPeriods().periods;
+const HISTORY = { granularity: 'history', from: '2024-01', to: '2026-07' } as const;
 
 describe('defaultSelection', () => {
   it('should select the most recent year with data in annual mode when periods exist', () => {
@@ -81,5 +84,32 @@ describe('monthShortLabel', () => {
     [9, 'Set'],
   ])('should abbreviate month %p as %p', (month, label) => {
     expect(monthShortLabel(month)).toBe(label);
+  });
+});
+
+describe('history selection', () => {
+  it('should span from the first to the last month with data when switching to history', () => {
+    expect(switchGranularity({ granularity: 'year', year: 2026 }, 'history', monthlyIndicatorPeriods)).toEqual(HISTORY);
+  });
+
+  it('should return to the most recent year when switching from history to annual', () => {
+    expect(switchGranularity(HISTORY, 'year', monthlyIndicatorPeriods)).toEqual({ granularity: 'year', year: 2026 });
+  });
+
+  it('should return to the most recent month with data when switching from history to monthly', () => {
+    expect(switchGranularity(HISTORY, 'month', monthlyIndicatorPeriods)).toEqual({ granularity: 'month', year: 2026, month: 7 });
+  });
+
+  it('should cover the first day of the first month to the last day of the last month', () => {
+    expect(rangeOfSelection(HISTORY)).toEqual({ from: '2024-01-01', to: '2026-07-31' });
+  });
+
+  it('should list every month of the span with the month and the two-digit year', () => {
+    const axis = periodAxis(HISTORY);
+
+    expect(axis.keys).toHaveLength(31);
+    expect([axis.keys[0], axis.keys.at(-1)]).toEqual(['2024-01', '2026-07']);
+    expect(axis.labels.slice(11, 13)).toEqual(['Dez/24', 'Jan/25']);
+    expect(axis.labels.at(-1)).toBe('Jul/26');
   });
 });

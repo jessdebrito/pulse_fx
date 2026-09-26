@@ -7,6 +7,7 @@ import ToggleButton from '@mui/material/ToggleButton';
 import ToggleButtonGroup from '@mui/material/ToggleButtonGroup';
 import { useId, type JSX } from 'react';
 import {
+  CALENDAR_GRANULARITIES,
   monthLabel,
   monthsOf,
   selectMonth,
@@ -22,6 +23,7 @@ export interface PeriodPickerProps {
   readonly available: readonly AvailablePeriod[];
   readonly value: PeriodSelection;
   readonly onChange: (selection: PeriodSelection) => void;
+  readonly granularities?: readonly Granularity[];
 }
 
 interface SelectOption {
@@ -33,9 +35,13 @@ const PICKER_SPACING = 2;
 const PICKER_STYLE = { alignItems: 'center', flexWrap: 'wrap' } as const;
 const SELECT_STYLE = { minWidth: 140 } as const;
 
-export function PeriodPicker({ available, value, onChange }: PeriodPickerProps): JSX.Element {
-  const years = yearsOf(available).map((year) => ({ value: String(year), label: String(year) }));
-  const months = monthsOf(available, value.year).map((month) => ({ value: String(month), label: monthLabel(month) }));
+const GRANULARITY_LABELS: Readonly<Record<Granularity, string>> = {
+  year: 'Anual',
+  month: 'Mensal',
+  history: 'Histórico',
+};
+
+export function PeriodPicker({ available, value, onChange, granularities = CALENDAR_GRANULARITIES }: PeriodPickerProps): JSX.Element {
   return (
     <Stack direction="row" spacing={PICKER_SPACING} sx={PICKER_STYLE}>
       <ToggleButtonGroup
@@ -47,14 +53,33 @@ export function PeriodPicker({ available, value, onChange }: PeriodPickerProps):
           if (granularity !== null) onChange(switchGranularity(value, granularity, available));
         }}
       >
-        <ToggleButton value="year">Anual</ToggleButton>
-        <ToggleButton value="month">Mensal</ToggleButton>
+        {granularities.map((granularity) => (
+          <ToggleButton key={granularity} value={granularity}>
+            {GRANULARITY_LABELS[granularity]}
+          </ToggleButton>
+        ))}
       </ToggleButtonGroup>
+      {value.granularity !== 'history' && <CalendarSelects available={available} value={value} onChange={onChange} />}
+    </Stack>
+  );
+}
+
+interface CalendarSelectsProps {
+  readonly available: readonly AvailablePeriod[];
+  readonly value: Exclude<PeriodSelection, { readonly granularity: 'history' }>;
+  readonly onChange: (selection: PeriodSelection) => void;
+}
+
+function CalendarSelects({ available, value, onChange }: CalendarSelectsProps): JSX.Element {
+  const years = yearsOf(available).map((year) => ({ value: String(year), label: String(year) }));
+  const months = monthsOf(available, value.year).map((month) => ({ value: String(month), label: monthLabel(month) }));
+  return (
+    <>
       <LabeledSelect label="Ano" value={String(value.year)} options={years} onChange={(year) => onChange(selectYear(value, Number(year), available))} />
       {value.granularity === 'month' && (
         <LabeledSelect label="Mês" value={String(value.month)} options={months} onChange={(month) => onChange(selectMonth(value, Number(month)))} />
       )}
-    </Stack>
+    </>
   );
 }
 

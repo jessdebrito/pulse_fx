@@ -1,0 +1,277 @@
+[
+  {
+    "source": "fred",
+    "code": "B235RC1Q027SBEA",
+    "name": "Federal government current tax receipts: Taxes on production and imports: Customs duties",
+    "unit": "Billions of Dollars",
+    "frequency": "quarterly",
+    "latestObservation": {
+      "date": "2026-04-01",
+      "value": 326.324
+    }
+  },
+  {
+    "source": "fred",
+    "code": "EPUTRADE",
+    "name": "Economic Policy Uncertainty Index: Categorical Index: Trade policy",
+    "unit": "Index",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 1248.2368946779902
+    }
+  },
+  {
+    "source": "fred",
+    "code": "EXP3510",
+    "name": "U.S. Exports of Goods by F.A.S. Basis to Brazil",
+    "unit": "Millions of Dollars",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 5442.431145
+    }
+  },
+  {
+    "source": "fred",
+    "code": "EXPCA",
+    "name": "U.S. Exports of Goods by F.A.S. Basis to Canada",
+    "unit": "Millions of Dollars",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 29338.645167
+    }
+  },
+  {
+    "source": "fred",
+    "code": "IMP3510",
+    "name": "U.S. Imports of Goods by Customs Basis from Brazil",
+    "unit": "Millions of Dollars",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 3387.521714
+    }
+  },
+  {
+    "source": "fred",
+    "code": "IMPCA",
+    "name": "U.S. Imports of Goods by Customs Basis from Canada",
+    "unit": "Millions of Dollars",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 33491.12506
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PBEEFUSDM",
+    "name": "Global price of Beef",
+    "unit": "U.S. Cents per Pound",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 331.7826086956522
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PCOFFOTMUSDM",
+    "name": "Global price of Coffee, Other Mild Arabica",
+    "unit": "U.S. Cents per Pound",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 359.1622727272727
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PFOODINDEXM",
+    "name": "Global price of Food index",
+    "unit": "Index 2016 = 100",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 131.7799097770027
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PIORECRUSDM",
+    "name": "Global price of Iron Ore",
+    "unit": "U.S. Dollars per Metric Ton",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 101.595652173913
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PMETAINDEXM",
+    "name": "Global price of Metal index",
+    "unit": "Index 2016 = 100",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 226.1695145629516
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PNGASUSUSDM",
+    "name": "Global price of Natural Gas, US Henry Hub Gas",
+    "unit": "U.S. Dollars per Million Metric British Thermal Unit",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 2.963181818181818
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PNRGINDEXM",
+    "name": "Global price of Energy index",
+    "unit": "Index 2016 = 100",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 198.7038051292526
+    }
+  },
+  {
+    "source": "fred",
+    "code": "POILBREUSDM",
+    "name": "Global price of Brent Crude",
+    "unit": "U.S. Dollars per Barrel",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 83.73409090909091
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PORANGUSDM",
+    "name": "Global price of Orange",
+    "unit": "U.S. Dollars per Pound",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 1.504409090909091
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PSOYBUSDM",
+    "name": "Global price of Soybeans",
+    "unit": "U.S. Dollars per Metric Ton",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 442.4505721529122
+    }
+  },
+  {
+    "source": "fred",
+    "code": "PSUGAISAUSDM",
+    "name": "Global price of Sugar, No. 11, World",
+    "unit": "U.S. Cents per Pound",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 14.81227272727273
+    }
+  },
+  {
+    "source": "fred",
+    "code": "WPU101",
+    "name": "Producer Price Index by Commodity: Metals and Metal Products: Iron and Steel",
+    "unit": "Index 1982=100",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-08-01",
+      "value": 378.128
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "22707",
+    "name": "Balança comercial - Balanço de Pagamentos - mensal - saldo",
+    "unit": "US$ (milhões)",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 6152.2
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "22708",
+    "name": "Exportação de bens - Balanço de Pagamentos - mensal",
+    "unit": "US$ (milhões)",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 34242.6
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "22709",
+    "name": "Importação de bens - Balanço de Pagamentos - mensal",
+    "unit": "US$ (milhões)",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-07-01",
+      "value": 28090.4
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "27574",
+    "name": "Índice de Commodities - Brasil",
+    "unit": "Índice",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-08-01",
+      "value": 456.24
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "27575",
+    "name": "Índice de Commodities - Brasil - Agropecuária",
+    "unit": "Índice",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-08-01",
+      "value": 453.51
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "27576",
+    "name": "Índice de Commodities - Brasil - Metal",
+    "unit": "Índice",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-08-01",
+      "value": 760.21
+    }
+  },
+  {
+    "source": "sgs",
+    "code": "27577",
+    "name": "Índice de Commodities - Brasil - Energia",
+    "unit": "Índice",
+    "frequency": "monthly",
+    "latestObservation": {
+      "date": "2026-08-01",
+      "value": 195.88
+    }
+  }
+]

@@ -1,8 +1,9 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import { SeriesChartModal } from '../../../src/components/series-chart-modal';
 import type { AvailablePeriod, PeriodSelection } from '../../../src/lib/periods';
-import { toClosingSeries, type TimeSeries } from '../../../src/lib/series';
+import { toClosingSeries, toIndicatorSeries, type TimeSeries } from '../../../src/lib/series';
 import { recordedUsdPeriods, recordedUsdQuotes } from '../../support/api/recorded-currencies';
+import { recordedUsImportsFromBrazilObservations, recordedUsImportsFromBrazilPeriods } from '../../support/api/recorded-indicators';
 import { createdCharts } from '../../support/mocks/chart-js';
 
 function renderModal(loadAvailability: () => Promise<readonly AvailablePeriod[]>, loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>): void {
@@ -42,19 +43,19 @@ describe('SeriesChartModal', () => {
     expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(30);
   });
 
-  it('should tell the user and skip the chart when the currency has no periods with data', async () => {
+  it('should tell the user and skip the chart when the series has no periods with data', async () => {
     const loadSeries = closingSeriesLoader();
 
     renderModal(() => Promise.resolve([]), loadSeries);
 
-    expect(await screen.findByText('Sem cotações disponíveis.')).toBeInTheDocument();
+    expect(await screen.findByText('Sem dados disponíveis.')).toBeInTheDocument();
     expect(loadSeries).not.toHaveBeenCalled();
   });
 
-  it('should tell the user when the selected period has no closing quotes', async () => {
+  it('should tell the user when the selected period has no data', async () => {
     renderModal(realAvailability, (selection) => Promise.resolve(toClosingSeries([], selection)));
 
-    expect(await screen.findByText('Sem cotações neste período.')).toBeInTheDocument();
+    expect(await screen.findByText('Sem dados neste período.')).toBeInTheDocument();
     expect(createdCharts).toHaveLength(0);
   });
 
@@ -68,5 +69,28 @@ describe('SeriesChartModal', () => {
     renderModal(realAvailability, () => Promise.reject(new Error('GET /api/currencies/USD/quotes responded with HTTP 500')));
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar o gráfico.');
+  });
+
+  it('should load and draw the full history when the granularities include Histórico and the user picks it', async () => {
+    const loadSeries = jest
+      .fn<Promise<TimeSeries>, [PeriodSelection]>()
+      .mockImplementation((selection) => Promise.resolve(toIndicatorSeries(recordedUsImportsFromBrazilObservations().observations, selection, 'Importações dos EUA vindas do Brasil')));
+    render(
+      <SeriesChartModal
+        open
+        title="Importações dos EUA vindas do Brasil"
+        onClose={jest.fn()}
+        loadAvailability={() => Promise.resolve(recordedUsImportsFromBrazilPeriods().periods)}
+        loadSeries={loadSeries}
+        granularities={['year', 'history']}
+      />,
+    );
+    await screen.findByRole('img', { name: 'Gráfico de Importações dos EUA vindas do Brasil' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Histórico' }));
+
+    expect(await screen.findByText('Variação no período: -9,88%')).toBeInTheDocument();
+    expect(loadSeries).toHaveBeenLastCalledWith({ granularity: 'history', from: '2024-01', to: '2026-07' });
+    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(31);
   });
 });

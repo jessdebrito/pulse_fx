@@ -1,0 +1,51 @@
+{
+  "source": "fred",
+  "code": "B235RC1Q027SBEA",
+  "name": "Federal government current tax receipts: Taxes on production and imports: Customs duties",
+  "unit": "Billions of Dollars",
+  "frequency": "quarterly",
+  "from": "2024-01-01",
+  "to": "2026-04-30",
+  "observations": [
+    {
+      "date": "2024-01-01",
+      "value": 82.342
+    },
+    {
+      "date": "2024-04-01",
+      "value": 78.941
+    },
+    {
+      "date": "2024-07-01",
+      "value": 85.865
+    },
+    {
+      "date": "2024-10-01",
+      "value": 87.199
+    },
+    {
+      "date": "2025-01-01",
+      "value": 96.965
+    },
+    {
+      "date": "2025-04-01",
+      "value": 267.681
+    },
+    {
+      "date": "2025-07-01",
+      "value": 331.423
+    },
+    {
+      "date": "2025-10-01",
+      "value": 364.324
+    },
+    {
+      "date": "2026-01-01",
+      "value": 346.15
+    },
+    {
+      "date": "2026-04-01",
+      "value": 326.324
+    }
+  ]
+}

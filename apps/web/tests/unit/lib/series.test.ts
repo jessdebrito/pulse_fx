@@ -1,5 +1,6 @@
-import { hasValues, toClosingSeries, variationPercent } from '../../../src/lib/series';
+import { hasValues, toClosingSeries, toIndicatorSeries, variationPercent } from '../../../src/lib/series';
 import { recordedUsdQuotes } from '../../support/api/recorded-currencies';
+import { recordedCustomsDutiesObservations, recordedUsImportsFromBrazilObservations } from '../../support/api/recorded-indicators';
 
 const quotes = recordedUsdQuotes().quotes;
 const SEPTEMBER_2026 = { granularity: 'month', year: 2026, month: 9 } as const;
@@ -36,6 +37,41 @@ describe('toClosingSeries', () => {
     );
 
     expect(hasValues(series)).toBe(false);
+  });
+});
+
+describe('toIndicatorSeries', () => {
+  const usImports = recordedUsImportsFromBrazilObservations().observations;
+
+  it('should place each monthly observation on a January to December axis when annual', () => {
+    const series = toIndicatorSeries(usImports, YEAR_2026, 'Importações dos EUA vindas do Brasil');
+
+    expect(series.labels).toEqual(['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']);
+    expect(series.datasets).toEqual([
+      {
+        id: 'value',
+        label: 'Importações dos EUA vindas do Brasil',
+        values: [2781.650258, 2309.326411, 2974.225395, 2649.202833, 3235.299191, 3133.627619, 3387.521714, null, null, null, null, null],
+      },
+    ]);
+  });
+
+  it('should place every month of the span on the axis when the selection is the full history', () => {
+    const series = toIndicatorSeries(usImports, { granularity: 'history', from: '2024-01', to: '2026-07' }, 'Importações');
+
+    expect(series.labels).toHaveLength(31);
+    const values = series.datasets[0]?.values ?? [];
+    expect(values.every((value) => value !== null)).toBe(true);
+    expect([values[0], values.at(-1)]).toEqual([3759.060245, 3387.521714]);
+  });
+
+  it('should leave the months between quarters empty when the series is quarterly', () => {
+    const series = toIndicatorSeries(recordedCustomsDutiesObservations().observations, { granularity: 'history', from: '2024-01', to: '2026-04' }, 'Tarifas');
+
+    const values = series.datasets[0]?.values ?? [];
+    expect(values).toHaveLength(28);
+    expect(values.filter((value) => value !== null)).toEqual([82.342, 78.941, 85.865, 87.199, 96.965, 267.681, 331.423, 364.324, 346.15, 326.324]);
+    expect(values.slice(0, 4)).toEqual([82.342, null, null, 78.941]);
   });
 });
 
