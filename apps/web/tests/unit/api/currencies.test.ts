@@ -1,4 +1,5 @@
-import { fetchCurrencies, fetchCurrencyPeriods, fetchCurrencyQuotes, type FetchFunction } from '../../../src/api/currencies';
+import { fetchCurrencies, fetchCurrencyPeriods, fetchCurrencyQuotes } from '../../../src/api/currencies';
+import type { FetchFunction } from '../../../src/api/http';
 import {
   jsonResponse,
   recordedCurrenciesResponse,

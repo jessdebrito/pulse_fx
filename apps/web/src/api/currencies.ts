@@ -1,5 +1,7 @@
 import { z } from 'zod';
 import type { DateRange } from '../lib/periods';
+import { browserFetch, getJson, type FetchFunction } from './http';
+import { availablePeriodsSchema } from './schemas';
 
 const quoteSchema = z.object({
   quotedAt: z.string(),
@@ -29,7 +31,7 @@ export const currencyQuotesSchema = z.object({
 
 export const currencyPeriodsSchema = z.object({
   code: z.string().length(3),
-  periods: z.array(z.object({ year: z.number().int(), months: z.array(z.number().int().min(1).max(12)) })),
+  periods: availablePeriodsSchema,
 });
 
 const currenciesResponseSchema = z.array(currencySummarySchema);
@@ -44,17 +46,7 @@ export type CurrencyPeriods = z.infer<typeof currencyPeriodsSchema>;
 
 export type Bulletin = Quote['bulletin'];
 
-export interface HttpResponse {
-  readonly ok: boolean;
-  readonly status: number;
-  json(): Promise<unknown>;
-}
-
-export type FetchFunction = (url: string) => Promise<HttpResponse>;
-
 const CURRENCIES_ROUTE = '/api/currencies';
-
-const browserFetch: FetchFunction = (url) => fetch(url);
 
 export function fetchCurrencies(fetchFunction: FetchFunction = browserFetch): Promise<CurrencySummary[]> {
   return getJson(fetchFunction, CURRENCIES_ROUTE, currenciesResponseSchema);
@@ -67,12 +59,4 @@ export function fetchCurrencyQuotes(code: string, range: DateRange, fetchFunctio
 
 export function fetchCurrencyPeriods(code: string, fetchFunction: FetchFunction = browserFetch): Promise<CurrencyPeriods> {
   return getJson(fetchFunction, `${CURRENCIES_ROUTE}/${encodeURIComponent(code)}/periods`, currencyPeriodsSchema);
-}
-
-async function getJson<T>(fetchFunction: FetchFunction, url: string, schema: z.ZodType<T>): Promise<T> {
-  const response = await fetchFunction(url);
-  if (!response.ok) {
-    throw new Error(`GET ${url} responded with HTTP ${response.status}`);
-  }
-  return schema.parse(await response.json());
 }

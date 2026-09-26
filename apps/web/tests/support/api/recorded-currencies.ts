@@ -8,8 +8,8 @@ import {
   type CurrencyPeriods,
   type CurrencyQuotes,
   type CurrencySummary,
-  type HttpResponse,
 } from '../../../src/api/currencies';
+import type { HttpResponse } from '../../../src/api/http';
 
 function readFixture(name: string): unknown {
   return JSON.parse(readFileSync(join(__dirname, '../../fixtures/api', name), 'utf8'));
