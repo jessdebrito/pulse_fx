@@ -1,0 +1,85 @@
+{
+  "@odata.context": "https://was-p.bcnet.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata$metadata#_CotacaoMoedaPeriodo(paridadeCompra,paridadeVenda,cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim)",
+  "value": [
+    {
+      "paridadeCompra": 6.5522,
+      "paridadeVenda": 6.5539,
+      "cotacaoCompra": 0.783,
+      "cotacaoVenda": 0.7833,
+      "dataHoraCotacao": "2026-09-23 10:09:12.049359",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 6.5582,
+      "paridadeVenda": 6.5599,
+      "cotacaoCompra": 0.7833,
+      "cotacaoVenda": 0.7836,
+      "dataHoraCotacao": "2026-09-23 11:05:11.963001",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 6.5569,
+      "paridadeVenda": 6.557,
+      "cotacaoCompra": 0.7845,
+      "cotacaoVenda": 0.7846,
+      "dataHoraCotacao": "2026-09-23 12:09:11.058949",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 6.5612,
+      "paridadeVenda": 6.5631,
+      "cotacaoCompra": 0.7846,
+      "cotacaoVenda": 0.7849,
+      "dataHoraCotacao": "2026-09-23 13:04:22.259409",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 6.5612,
+      "paridadeVenda": 6.5631,
+      "cotacaoCompra": 0.7833,
+      "cotacaoVenda": 0.7836,
+      "dataHoraCotacao": "2026-09-23 13:04:22.36175",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 6.5722,
+      "paridadeVenda": 6.5732,
+      "cotacaoCompra": 0.7862,
+      "cotacaoVenda": 0.7864,
+      "dataHoraCotacao": "2026-09-24 10:05:12.142503",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 6.5723,
+      "paridadeVenda": 6.574,
+      "cotacaoCompra": 0.7866,
+      "cotacaoVenda": 0.7869,
+      "dataHoraCotacao": "2026-09-24 11:05:11.049556",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 6.5718,
+      "paridadeVenda": 6.5735,
+      "cotacaoCompra": 0.7884,
+      "cotacaoVenda": 0.7887,
+      "dataHoraCotacao": "2026-09-24 12:02:15.561312",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 6.5723,
+      "paridadeVenda": 6.5742,
+      "cotacaoCompra": 0.7902,
+      "cotacaoVenda": 0.7905,
+      "dataHoraCotacao": "2026-09-24 13:03:18.602841",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 6.5723,
+      "paridadeVenda": 6.5742,
+      "cotacaoCompra": 0.7878,
+      "cotacaoVenda": 0.7881,
+      "dataHoraCotacao": "2026-09-24 13:03:18.656275",
+      "tipoBoletim": "Fechamento"
+    }
+  ]
+}

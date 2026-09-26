@@ -1,0 +1,101 @@
+{
+  "@odata.context": "https://was-p.bcnet.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata$metadata#_CotacaoMoedaPeriodo(paridadeCompra,paridadeVenda,cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim)",
+  "value": [
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.5201,
+      "cotacaoVenda": 5.5207,
+      "dataHoraCotacao": "2025-12-30 10:10:25.266",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4965,
+      "cotacaoVenda": 5.4971,
+      "dataHoraCotacao": "2025-12-30 11:11:25.981",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4985,
+      "cotacaoVenda": 5.4991,
+      "dataHoraCotacao": "2025-12-30 12:10:27.835",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.492,
+      "cotacaoVenda": 5.4926,
+      "dataHoraCotacao": "2025-12-30 13:12:00.334",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.5018,
+      "cotacaoVenda": 5.5024,
+      "dataHoraCotacao": "2025-12-30 13:12:00.341",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.5018,
+      "cotacaoVenda": 5.5024,
+      "dataHoraCotacao": "2025-12-31 10:06:24.179",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.5018,
+      "cotacaoVenda": 5.5024,
+      "dataHoraCotacao": "2025-12-31 10:06:24.183",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4322,
+      "cotacaoVenda": 5.4328,
+      "dataHoraCotacao": "2026-01-02 10:02:27.416",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4322,
+      "cotacaoVenda": 5.4328,
+      "dataHoraCotacao": "2026-01-02 11:03:26.067",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4447,
+      "cotacaoVenda": 5.4453,
+      "dataHoraCotacao": "2026-01-02 12:09:25.423",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4372,
+      "cotacaoVenda": 5.4378,
+      "dataHoraCotacao": "2026-01-02 13:03:33.249",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.4366,
+      "cotacaoVenda": 5.4372,
+      "dataHoraCotacao": "2026-01-02 13:03:33.254",
+      "tipoBoletim": "Fechamento"
+    }
+  ]
+}
