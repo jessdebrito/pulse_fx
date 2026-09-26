@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import { App, type AppProps } from '../../src/app';
+import { App, type AppProps, type ChartModalComponent } from '../../src/app';
+import { SeriesChartModal } from '../../src/components/series-chart-modal';
 import type { CurrencyPeriods, CurrencyQuotes } from '../../src/api/currencies';
 import type { IndicatorKey, IndicatorObservations, IndicatorPeriods } from '../../src/api/indicators';
 import type { DateRange } from '../../src/lib/periods';
@@ -43,6 +44,28 @@ describe('App', () => {
     expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(12);
     expect(loadCurrencyPeriods).toHaveBeenCalledWith('USD');
     expect(loadCurrencyQuotes).toHaveBeenCalledWith('USD', { from: '2026-01-01', to: '2026-12-31' });
+  });
+
+  it('should load the chart modal code only when the user opens a chart', async () => {
+    const loadChartModal = jest.fn<Promise<ChartModalComponent>, []>().mockResolvedValue(SeriesChartModal);
+    renderApp({ loadChartModal, loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()), loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()) });
+    await screen.findByRole('table', { name: 'Comércio EUA' });
+
+    expect(loadChartModal).not.toHaveBeenCalled();
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver gráfico de USD' }));
+
+    expect(await screen.findByRole('dialog', { name: 'USD — Dólar dos Estados Unidos' })).toBeInTheDocument();
+    expect(loadChartModal).toHaveBeenCalledTimes(1);
+  });
+
+  it('should show an error alert instead of the chart when the chart modal code cannot be loaded', async () => {
+    renderApp({ loadChartModal: () => Promise.reject(new Error('Failed to fetch dynamically imported module')) });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver gráfico de Importações dos EUA vindas do Brasil' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível abrir o gráfico.');
+    expect(screen.queryByRole('dialog')).not.toBeInTheDocument();
   });
 
   it('should show the exchange rates and the indicators grouped by theme under their own headings', async () => {

@@ -2,7 +2,7 @@ import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
 import Typography from '@mui/material/Typography';
-import { useCallback, useState, type JSX, type ReactNode } from 'react';
+import { useCallback, useState, type ComponentType, type JSX, type ReactNode } from 'react';
 import { fetchCurrencies, fetchCurrencyPeriods, fetchCurrencyQuotes, type CurrencyPeriods, type CurrencyQuotes, type CurrencySummary } from './api/currencies';
 import {
   fetchIndicatorObservations,
@@ -15,7 +15,8 @@ import {
 } from './api/indicators';
 import { CurrenciesTable } from './components/currencies-table';
 import { IndicatorGroups } from './components/indicator-groups';
-import { SeriesChartModal } from './components/series-chart-modal';
+import type { SeriesChartModalProps } from './components/series-chart-modal';
+import { useAsync } from './hooks/use-async';
 import { useCurrencies, type CurrenciesLoader, type CurrenciesState } from './hooks/use-currencies';
 import { useIndicators, type IndicatorsLoader, type IndicatorsState } from './hooks/use-indicators';
 import { displayNameOf } from './lib/indicators';
@@ -30,7 +31,12 @@ export type IndicatorObservationsLoader = (key: IndicatorKey, range: DateRange) 
 
 export type IndicatorPeriodsLoader = (key: IndicatorKey) => Promise<IndicatorPeriods>;
 
+export type ChartModalComponent = ComponentType<SeriesChartModalProps>;
+
+export type ChartModalLoader = () => Promise<ChartModalComponent>;
+
 export interface AppProps {
+  readonly loadChartModal?: ChartModalLoader;
   readonly loadCurrencies?: CurrenciesLoader;
   readonly loadCurrencyQuotes?: CurrencyQuotesLoader;
   readonly loadCurrencyPeriods?: CurrencyPeriodsLoader;
@@ -40,9 +46,12 @@ export interface AppProps {
 }
 
 const INDICATOR_GRANULARITIES: readonly Granularity[] = Object.freeze(['year', 'history']);
+
+const loadSeriesChartModal: ChartModalLoader = () => import('./components/series-chart-modal').then((module) => module.SeriesChartModal);
 const SECTION_STYLE = { mb: 4 } as const;
 
 export function App({
+  loadChartModal = loadSeriesChartModal,
   loadCurrencies = fetchCurrencies,
   loadCurrencyQuotes = fetchCurrencyQuotes,
   loadCurrencyPeriods = fetchCurrencyPeriods,
@@ -56,11 +65,13 @@ export function App({
         Pulse FX
       </Typography>
       <CurrenciesSection
+        loadChartModal={loadChartModal}
         loadCurrencies={loadCurrencies}
         loadCurrencyQuotes={loadCurrencyQuotes}
         loadCurrencyPeriods={loadCurrencyPeriods}
       />
       <IndicatorsSection
+        loadChartModal={loadChartModal}
         loadIndicators={loadIndicators}
         loadIndicatorObservations={loadIndicatorObservations}
         loadIndicatorPeriods={loadIndicatorPeriods}
@@ -81,12 +92,13 @@ function Section({ title, children }: { readonly title: string; readonly childre
 }
 
 interface CurrenciesSectionProps {
+  readonly loadChartModal: ChartModalLoader;
   readonly loadCurrencies: CurrenciesLoader;
   readonly loadCurrencyQuotes: CurrencyQuotesLoader;
   readonly loadCurrencyPeriods: CurrencyPeriodsLoader;
 }
 
-function CurrenciesSection({ loadCurrencies, loadCurrencyQuotes, loadCurrencyPeriods }: CurrenciesSectionProps): JSX.Element {
+function CurrenciesSection({ loadChartModal, loadCurrencies, loadCurrencyQuotes, loadCurrencyPeriods }: CurrenciesSectionProps): JSX.Element {
   const state = useCurrencies(loadCurrencies);
   const [selected, setSelected] = useState<CurrencySummary | null>(null);
   return (
@@ -95,6 +107,7 @@ function CurrenciesSection({ loadCurrencies, loadCurrencyQuotes, loadCurrencyPer
       {selected !== null && (
         <CurrencyChartModal
           currency={selected}
+          loadChartModal={loadChartModal}
           loadCurrencyQuotes={loadCurrencyQuotes}
           loadCurrencyPeriods={loadCurrencyPeriods}
           onClose={() => setSelected(null)}
@@ -105,12 +118,13 @@ function CurrenciesSection({ loadCurrencies, loadCurrencyQuotes, loadCurrencyPer
 }
 
 interface IndicatorsSectionProps {
+  readonly loadChartModal: ChartModalLoader;
   readonly loadIndicators: IndicatorsLoader;
   readonly loadIndicatorObservations: IndicatorObservationsLoader;
   readonly loadIndicatorPeriods: IndicatorPeriodsLoader;
 }
 
-function IndicatorsSection({ loadIndicators, loadIndicatorObservations, loadIndicatorPeriods }: IndicatorsSectionProps): JSX.Element {
+function IndicatorsSection({ loadChartModal, loadIndicators, loadIndicatorObservations, loadIndicatorPeriods }: IndicatorsSectionProps): JSX.Element {
   const state = useIndicators(loadIndicators);
   const [selected, setSelected] = useState<IndicatorSummary | null>(null);
   return (
@@ -119,6 +133,7 @@ function IndicatorsSection({ loadIndicators, loadIndicatorObservations, loadIndi
       {selected !== null && (
         <IndicatorChartModal
           indicator={selected}
+          loadChartModal={loadChartModal}
           loadIndicatorObservations={loadIndicatorObservations}
           loadIndicatorPeriods={loadIndicatorPeriods}
           onClose={() => setSelected(null)}
@@ -152,12 +167,13 @@ function IndicatorsContent({ state, onShowChart }: IndicatorsContentProps): JSX.
 
 interface CurrencyChartModalProps {
   readonly currency: CurrencySummary;
+  readonly loadChartModal: ChartModalLoader;
   readonly loadCurrencyQuotes: CurrencyQuotesLoader;
   readonly loadCurrencyPeriods: CurrencyPeriodsLoader;
   readonly onClose: () => void;
 }
 
-function CurrencyChartModal({ currency, loadCurrencyQuotes, loadCurrencyPeriods, onClose }: CurrencyChartModalProps): JSX.Element {
+function CurrencyChartModal({ currency, loadChartModal, loadCurrencyQuotes, loadCurrencyPeriods, onClose }: CurrencyChartModalProps): JSX.Element | null {
   const loadSeries = useCallback(
     (selection: PeriodSelection): Promise<TimeSeries> =>
       loadCurrencyQuotes(currency.code, rangeOfSelection(selection)).then((history) => toClosingSeries(history.quotes, selection)),
@@ -168,7 +184,8 @@ function CurrencyChartModal({ currency, loadCurrencyQuotes, loadCurrencyPeriods,
     [currency.code, loadCurrencyPeriods],
   );
   return (
-    <SeriesChartModal
+    <LoadedChartModal
+      loadChartModal={loadChartModal}
       open
       title={`${currency.code} — ${currency.name}`}
       onClose={onClose}
@@ -180,12 +197,13 @@ function CurrencyChartModal({ currency, loadCurrencyQuotes, loadCurrencyPeriods,
 
 interface IndicatorChartModalProps {
   readonly indicator: IndicatorSummary;
+  readonly loadChartModal: ChartModalLoader;
   readonly loadIndicatorObservations: IndicatorObservationsLoader;
   readonly loadIndicatorPeriods: IndicatorPeriodsLoader;
   readonly onClose: () => void;
 }
 
-function IndicatorChartModal({ indicator, loadIndicatorObservations, loadIndicatorPeriods, onClose }: IndicatorChartModalProps): JSX.Element {
+function IndicatorChartModal({ indicator, loadChartModal, loadIndicatorObservations, loadIndicatorPeriods, onClose }: IndicatorChartModalProps): JSX.Element | null {
   const { source, code } = indicator;
   const title = displayNameOf(indicator);
   const loadSeries = useCallback(
@@ -198,7 +216,8 @@ function IndicatorChartModal({ indicator, loadIndicatorObservations, loadIndicat
     [source, code, loadIndicatorPeriods],
   );
   return (
-    <SeriesChartModal
+    <LoadedChartModal
+      loadChartModal={loadChartModal}
       open
       title={title}
       onClose={onClose}
@@ -207,4 +226,16 @@ function IndicatorChartModal({ indicator, loadIndicatorObservations, loadIndicat
       granularities={INDICATOR_GRANULARITIES}
     />
   );
+}
+
+interface LoadedChartModalProps extends SeriesChartModalProps {
+  readonly loadChartModal: ChartModalLoader;
+}
+
+function LoadedChartModal({ loadChartModal, ...modalProps }: LoadedChartModalProps): JSX.Element | null {
+  const chartModal = useAsync(loadChartModal);
+  if (chartModal.status === 'loading') return null;
+  if (chartModal.status === 'error') return <Alert severity="error">Não foi possível abrir o gráfico.</Alert>;
+  const ChartModal = chartModal.data;
+  return <ChartModal {...modalProps} />;
 }
