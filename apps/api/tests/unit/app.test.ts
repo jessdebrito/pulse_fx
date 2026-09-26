@@ -1,11 +1,13 @@
 import request from 'supertest';
 import { createApp } from '../../src/app';
+import type { CurrenciesReader } from '../../src/modules/currencies';
 import type { AppLogger } from '../../src/shared/logger';
 
 const silentLogger: AppLogger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+const unusedCurrencies: CurrenciesReader = { listWithLatestQuote: jest.fn(), getQuotes: jest.fn(), getAvailablePeriods: jest.fn() };
 
 function app(): ReturnType<typeof createApp> {
-  return createApp({ logger: silentLogger });
+  return createApp({ logger: silentLogger, currenciesService: unusedCurrencies });
 }
 
 describe('createApp', () => {
