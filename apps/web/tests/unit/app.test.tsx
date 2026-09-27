@@ -189,4 +189,23 @@ describe('App', () => {
     await screen.findByRole('table', { name: 'Cotações PTAX por moeda' });
     expect(screen.getByRole('main')).toHaveStyle({ paddingTop: '32px', paddingBottom: '96px' });
   });
+
+  it('should list the PTAX limitations in the chart modal of a currency', async () => {
+    renderApp({ loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()), loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()) });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver gráfico de USD' }));
+
+    const list = await screen.findByRole('list', { name: 'Observações' });
+    expect(within(list).getByText('A PTAX é publicada só em dias úteis: fins de semana e feriados ficam sem ponto no gráfico, sem interpolação.')).toBeInTheDocument();
+  });
+
+  it('should list the source and series limitations in the chart modal of an indicator', async () => {
+    renderApp({ loadIndicatorPeriods: () => Promise.resolve(recordedUsImportsFromBrazilPeriods()), loadIndicatorObservations: () => Promise.resolve(recordedUsImportsFromBrazilObservations()) });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver gráfico de Importações dos EUA vindas do Brasil' }));
+
+    const list = await screen.findByRole('list', { name: 'Observações' });
+    expect(within(list).getAllByRole('listitem')).toHaveLength(4);
+    expect(within(list).getByText(/Census dos EUA sem ajuste sazonal/)).toBeInTheDocument();
+  });
 });

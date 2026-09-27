@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { SeriesChartModal } from '../../../src/components/series-chart-modal';
 import type { AvailablePeriod, PeriodSelection } from '../../../src/lib/periods';
 import { toClosingSeries, toIndicatorSeries, type TimeSeries } from '../../../src/lib/series';
@@ -15,9 +15,12 @@ function renderModal(loadAvailability: () => Promise<readonly AvailablePeriod[]>
       loadAvailability={loadAvailability}
       loadSeries={loadSeries}
       variationText={USD_VARIATION_TEXT}
+      limitations={PTAX_LIMITATIONS}
     />,
   );
 }
+
+const PTAX_LIMITATIONS = ['A PTAX é publicada só em dias úteis.', 'O gráfico usa o fechamento PTAX (venda).'];
 
 const USD_VARIATION_TEXT = 'Variação (5 dias úteis): +0,81% — de 5,1575 em 18/09/2026 para 5,1991 em 25/09/2026';
 
@@ -100,6 +103,7 @@ describe('SeriesChartModal', () => {
         loadSeries={loadSeries}
         granularities={['year', 'history']}
         variationText="Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026"
+        limitations={[]}
       />,
     );
     await screen.findByRole('img', { name: 'Gráfico de Importações dos EUA vindas do Brasil' });
@@ -108,5 +112,12 @@ describe('SeriesChartModal', () => {
 
     await waitFor(() => expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(31));
     expect(loadSeries).toHaveBeenLastCalledWith({ granularity: 'history', from: '2024-01', to: '2026-07' });
+  });
+
+  it('should list the data limitations given by the caller under their own heading', async () => {
+    renderModal(realAvailability, closingSeriesLoader());
+
+    const list = await screen.findByRole('list', { name: 'Observações' });
+    expect(within(list).getAllByRole('listitem').map((item) => item.textContent)).toEqual(PTAX_LIMITATIONS);
   });
 });

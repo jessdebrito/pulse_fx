@@ -1,7 +1,8 @@
 import Alert from '@mui/material/Alert';
+import Box from '@mui/material/Box';
 import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
-import { useCallback, useState, type JSX } from 'react';
+import { useCallback, useId, useState, type JSX } from 'react';
 import { useAsync, type AsyncState } from '../hooks/use-async';
 import { CALENDAR_GRANULARITIES, defaultSelection, type AvailablePeriod, type Granularity, type PeriodSelection } from '../lib/periods';
 import { hasValues, type TimeSeries } from '../lib/series';
@@ -17,6 +18,7 @@ export interface SeriesChartModalProps {
   readonly loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>;
   readonly granularities?: readonly Granularity[];
   readonly variationText: string;
+  readonly limitations: readonly string[];
 }
 
 interface ChartSettings {
@@ -27,6 +29,7 @@ interface ChartSettings {
 
 const CONTENT_SPACING = 2;
 const LOAD_ERROR_MESSAGE = 'Não foi possível carregar o gráfico.';
+const LIMITATIONS_LIST_STYLE = { m: 0, pl: 3 } as const;
 
 export function SeriesChartModal({
   open,
@@ -36,6 +39,7 @@ export function SeriesChartModal({
   loadSeries,
   granularities = CALENDAR_GRANULARITIES,
   variationText,
+  limitations,
 }: SeriesChartModalProps): JSX.Element {
   const availability = useAsync(loadAvailability);
   const settings: ChartSettings = { loadSeries, chartLabel: `Gráfico de ${title}`, granularities };
@@ -44,6 +48,7 @@ export function SeriesChartModal({
       <Stack spacing={CONTENT_SPACING}>
         <Typography>{variationText}</Typography>
         <AvailabilityContent availability={availability} settings={settings} />
+        <LimitationsList limitations={limitations} />
       </Stack>
     </AppModal>
   );
@@ -86,4 +91,23 @@ function SeriesContent({ state, chartLabel }: { readonly state: AsyncState<TimeS
   if (state.status === 'error') return <Alert severity="error">{LOAD_ERROR_MESSAGE}</Alert>;
   if (!hasValues(state.data)) return <Typography>Sem dados neste período.</Typography>;
   return <LineChart ariaLabel={chartLabel} series={state.data} />;
+}
+
+function LimitationsList({ limitations }: { readonly limitations: readonly string[] }): JSX.Element | null {
+  const headingId = useId();
+  if (limitations.length === 0) return null;
+  return (
+    <Box component="section">
+      <Typography id={headingId} variant="subtitle2" component="h3">
+        Observações
+      </Typography>
+      <Box component="ul" aria-labelledby={headingId} sx={LIMITATIONS_LIST_STYLE}>
+        {limitations.map((limitation) => (
+          <Typography key={limitation} component="li" variant="body2" color="text.secondary">
+            {limitation}
+          </Typography>
+        ))}
+      </Box>
+    </Box>
+  );
 }
