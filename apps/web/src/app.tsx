@@ -18,6 +18,7 @@ import {
 } from './api/indicators';
 import type { FavoritesClient } from './api/favorites';
 import { CurrenciesTable } from './components/currencies-table';
+import { Disclaimer } from './components/disclaimer';
 import { IndicatorGroups } from './components/indicator-groups';
 import type { SeriesChartModalProps } from './components/series-chart-modal';
 import { useAsync } from './hooks/use-async';
@@ -56,6 +57,7 @@ export interface AppProps {
 const INDICATOR_GRANULARITIES: readonly Granularity[] = Object.freeze(['year', 'history']);
 
 const loadSeriesChartModal: ChartModalLoader = () => import('./components/series-chart-modal').then((module) => module.SeriesChartModal);
+const PAGE_STYLE = { pt: 4, pb: 12 } as const;
 const SECTION_STYLE = { mb: 4 } as const;
 const FAVORITES_BAR_STYLE = { mb: 2 } as const;
 
@@ -78,26 +80,29 @@ export function App({
   const [onlyFavorites, setOnlyFavorites] = useState(false);
   const filter: FavoriteFilter = { view: favorites, onlyFavorites };
   return (
-    <Container component="main" maxWidth="lg">
-      <Typography variant="h4" component="h1" gutterBottom>
-        Pulse FX
-      </Typography>
-      <FavoritesBar filter={filter} onChange={setOnlyFavorites} />
-      <CurrenciesSection
-        filter={filter}
-        loadChartModal={loadChartModal}
-        loadCurrencies={loadCurrencies}
-        loadCurrencyQuotes={loadCurrencyQuotes}
-        loadCurrencyPeriods={loadCurrencyPeriods}
-      />
-      <IndicatorsSection
-        filter={filter}
-        loadChartModal={loadChartModal}
-        loadIndicators={loadIndicators}
-        loadIndicatorObservations={loadIndicatorObservations}
-        loadIndicatorPeriods={loadIndicatorPeriods}
-      />
-    </Container>
+    <>
+      <Container component="main" maxWidth="lg" sx={PAGE_STYLE}>
+        <Typography variant="h4" component="h1" gutterBottom>
+          Pulse FX
+        </Typography>
+        <FavoritesBar filter={filter} onChange={setOnlyFavorites} />
+        <CurrenciesSection
+          filter={filter}
+          loadChartModal={loadChartModal}
+          loadCurrencies={loadCurrencies}
+          loadCurrencyQuotes={loadCurrencyQuotes}
+          loadCurrencyPeriods={loadCurrencyPeriods}
+        />
+        <IndicatorsSection
+          filter={filter}
+          loadChartModal={loadChartModal}
+          loadIndicators={loadIndicators}
+          loadIndicatorObservations={loadIndicatorObservations}
+          loadIndicatorPeriods={loadIndicatorPeriods}
+        />
+      </Container>
+      <Disclaimer />
+    </>
   );
 }
 

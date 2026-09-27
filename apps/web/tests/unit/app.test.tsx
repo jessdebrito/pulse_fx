@@ -176,4 +176,17 @@ describe('App', () => {
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar os favoritos.');
   });
+
+  it('should show the disclaimer on the page', async () => {
+    renderApp();
+
+    expect(await screen.findByRole('contentinfo')).toHaveTextContent('Informação educacional. Não constitui recomendação de investimento.');
+  });
+
+  it('should leave space above the title and below the content for the fixed disclaimer', async () => {
+    renderApp();
+
+    await screen.findByRole('table', { name: 'Cotações PTAX por moeda' });
+    expect(screen.getByRole('main')).toHaveStyle({ paddingTop: '32px', paddingBottom: '96px' });
+  });
 });
