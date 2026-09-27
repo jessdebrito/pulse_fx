@@ -3,8 +3,8 @@ import TableCell from '@mui/material/TableCell';
 import Typography from '@mui/material/Typography';
 import type { JSX } from 'react';
 import type { Variation } from '../api/schemas';
-import { formatPercent } from '../lib/format';
 import { describeVariationBase, type VariationFormat } from '../lib/variation';
+import { VariationPercent } from './variation-percent';
 
 export interface VariationCellProps {
   readonly variation: Variation | null;
@@ -19,7 +19,7 @@ export function VariationCell({ variation, format }: VariationCellProps): JSX.El
   return (
     <TableCell align="right">
       <Stack sx={CELL_STYLE}>
-        <span>{formatPercent(variation.percent)}</span>
+        <VariationPercent percent={variation.percent} />
         <Typography variant="caption" color="text.secondary">
           {describeVariationBase(variation, format)}
         </Typography>

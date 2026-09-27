@@ -1,3 +1,4 @@
+import { createTheme } from '@mui/material/styles';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { CurrencySummary } from '../../../src/api/currencies';
 import { CurrencyCards } from '../../../src/components/currency-cards';
@@ -41,7 +42,7 @@ describe('CurrencyCards', () => {
     expect(card.getByText('5,1991')).toBeInTheDocument();
     expect(card.getByText('Venda (R$) · Compra 5,1985')).toBeInTheDocument();
     expect(card.getByText('Fechamento · 25/09/2026 13:10')).toBeInTheDocument();
-    expect(card.getByText('+0,81% em 5 dias úteis')).toBeInTheDocument();
+    expect(card.getByText('+0,81%').parentElement).toHaveTextContent(/^\+0,81% em 5 dias úteis$/);
     expect(card.getByText('vs 5,1575 em 18/09/2026')).toBeInTheDocument();
   });
 
@@ -83,5 +84,12 @@ describe('CurrencyCards', () => {
     renderCards([{ ...recordedCurrency('USD'), trend: [] }]);
 
     expect(within(cardOf('USD')).queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('should color the percent of the variation by its sign', () => {
+    renderCards(recordedCurrencySummaries());
+
+    expect(within(cardOf('USD')).getByText('+0,81%')).toHaveStyle({ color: createTheme().palette.success.main });
+    expect(within(cardOf('AUD')).getByText('-0,30%')).toHaveStyle({ color: createTheme().palette.error.main });
   });
 });

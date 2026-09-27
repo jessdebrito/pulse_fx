@@ -1,3 +1,4 @@
+import { createTheme } from '@mui/material/styles';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { IndicatorSummary } from '../../../src/api/indicators';
 import { IndicatorCards } from '../../../src/components/indicator-cards';
@@ -41,7 +42,7 @@ describe('IndicatorCards', () => {
     expect(card.getByText('3.387,52')).toBeInTheDocument();
     expect(card.getByText('Millions of Dollars')).toBeInTheDocument();
     expect(card.getByText('jul/2026 · Mensal · FRED')).toBeInTheDocument();
-    expect(card.getByText('-16,04% em 12 meses')).toBeInTheDocument();
+    expect(card.getByText('-16,04%').parentElement).toHaveTextContent(/^-16,04% em 12 meses$/);
     expect(card.getByText('vs 4.034,78 em jul/2025')).toBeInTheDocument();
   });
 
@@ -50,7 +51,7 @@ describe('IndicatorCards', () => {
 
     const duties = within(cardOf('Tarifas de importação arrecadadas pelos EUA'));
     expect(duties.getByText('2º tri/2026 · Trimestral · FRED')).toBeInTheDocument();
-    expect(duties.getByText('+21,91% em 12 meses')).toBeInTheDocument();
+    expect(duties.getByText('+21,91%').parentElement).toHaveTextContent(/^\+21,91% em 12 meses$/);
     expect(duties.getByText('vs 267,68 em 2º tri/2025')).toBeInTheDocument();
     expect(within(cardOf('Índice de Commodities Brasil (IC-Br)')).getByText('ago/2026 · Mensal · BCB SGS')).toBeInTheDocument();
   });
@@ -94,5 +95,12 @@ describe('IndicatorCards', () => {
     renderCards([{ ...US_IMPORTS, trend: [] }]);
 
     expect(within(cardOf('Importações dos EUA vindas do Brasil')).queryByRole('img')).not.toBeInTheDocument();
+  });
+
+  it('should color the percent of the variation by its sign', () => {
+    renderCards([US_IMPORTS, CUSTOMS_DUTIES]);
+
+    expect(within(cardOf('Importações dos EUA vindas do Brasil')).getByText('-16,04%')).toHaveStyle({ color: createTheme().palette.error.main });
+    expect(within(cardOf('Tarifas de importação arrecadadas pelos EUA')).getByText('+21,91%')).toHaveStyle({ color: createTheme().palette.success.main });
   });
 });

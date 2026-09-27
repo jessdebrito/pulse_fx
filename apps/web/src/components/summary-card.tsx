@@ -10,9 +10,10 @@ import type { JSX, ReactNode } from 'react';
 import type { IndicatorFrequency } from '../api/indicators';
 import type { TrendPoint, Variation } from '../api/schemas';
 import { describeTrend } from '../lib/sparkline';
-import { describeVariationBase, describeVariationPercent, type VariationFormat } from '../lib/variation';
+import { describeVariationBase, variationBasisLabel, type VariationFormat } from '../lib/variation';
 import { FavoriteButton } from './favorite-button';
 import { Sparkline } from './sparkline';
+import { VariationPercent } from './variation-percent';
 
 export interface SummaryCardHeading {
   readonly title: string;
@@ -116,7 +117,10 @@ export function SummaryVariation({ variation, frequency, format }: SummaryVariat
   if (variation === null) return <SummaryNote text={NO_BASE_TEXT} />;
   return (
     <Box>
-      <Typography>{describeVariationPercent(variation, frequency)}</Typography>
+      <Typography>
+        <VariationPercent percent={variation.percent} />
+        {` em ${variationBasisLabel(variation.rule, frequency)}`}
+      </Typography>
       <Typography variant="caption" color="text.secondary">
         {describeVariationBase(variation, format)}
       </Typography>

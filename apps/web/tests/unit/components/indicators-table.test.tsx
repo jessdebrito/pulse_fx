@@ -1,3 +1,4 @@
+import { createTheme } from '@mui/material/styles';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { IndicatorSummary } from '../../../src/api/indicators';
 import { IndicatorsTable } from '../../../src/components/indicators-table';
@@ -87,5 +88,12 @@ describe('IndicatorsTable', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar Tarifas de importação arrecadadas pelos EUA aos favoritos', pressed: false }));
 
     expect(onToggleFavorite).toHaveBeenCalledWith(CUSTOMS_DUTIES);
+  });
+
+  it('should color the percent of the variation by its sign', () => {
+    renderTable([US_IMPORTS, CUSTOMS_DUTIES]);
+
+    expect(screen.getByText('-16,04%')).toHaveStyle({ color: createTheme().palette.error.main });
+    expect(screen.getByText('+21,91%')).toHaveStyle({ color: createTheme().palette.success.main });
   });
 });

@@ -8,6 +8,7 @@ export interface VariationFormat {
 }
 
 const NO_BASE_TEXT = 'Variação: sem base de comparação.';
+const PERCENT_DISPLAY_SCALE = 100;
 
 export const CURRENCY_VARIATION_FORMAT: VariationFormat = Object.freeze({
   value: formatQuoteValue,
@@ -36,8 +37,13 @@ export function describeVariation(variation: Variation | null, frequency: Indica
   return `Variação (${basis}): ${formatPercent(variation.percent)} — de ${base} para ${latest}`;
 }
 
-export function describeVariationPercent(variation: Variation, frequency: IndicatorFrequency): string {
-  return `${formatPercent(variation.percent)} em ${variationBasisLabel(variation.rule, frequency)}`;
+export type VariationTone = 'positive' | 'negative' | 'neutral';
+
+export function variationTone(percent: number): VariationTone {
+  const shown = Math.sign(percent) * Math.round(Math.abs(percent) * PERCENT_DISPLAY_SCALE);
+  if (shown > 0) return 'positive';
+  if (shown < 0) return 'negative';
+  return 'neutral';
 }
 
 export function describeVariationBase(variation: Variation, format: VariationFormat): string {

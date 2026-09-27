@@ -1,5 +1,5 @@
 import { formatIndicatorValue, formatQuoteValue, formatReferenceDate } from '../../../src/lib/format';
-import { describeVariation, describeVariationBase, describeVariationPercent, variationBasisLabel, type VariationFormat } from '../../../src/lib/variation';
+import { describeVariation, describeVariationBase, variationBasisLabel, variationTone, type VariationFormat } from '../../../src/lib/variation';
 import { recordedCurrency } from '../../support/api/recorded-currencies';
 import { recordedIndicator } from '../../support/api/recorded-indicators';
 
@@ -47,9 +47,13 @@ describe('describeVariationBase', () => {
   });
 });
 
-describe('describeVariationPercent', () => {
-  it('should show the percent followed by the period of the rule', () => {
-    expect(describeVariationPercent(variationOf(recordedCurrency('USD')), 'daily')).toBe('+0,81% em 5 dias úteis');
-    expect(describeVariationPercent(variationOf(recordedIndicator('fred', 'IMP3510')), 'monthly')).toBe('-16,04% em 12 meses');
+describe('variationTone', () => {
+  it.each([
+    [0.8066, 'positive'],
+    [-16.0419, 'negative'],
+    [0, 'neutral'],
+    [0.001, 'neutral'],
+  ] as const)('should classify %p as %p by the percent shown with two decimals', (percent, tone) => {
+    expect(variationTone(percent)).toBe(tone);
   });
 });

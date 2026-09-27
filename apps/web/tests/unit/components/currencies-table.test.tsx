@@ -1,3 +1,4 @@
+import { createTheme } from '@mui/material/styles';
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import { CurrenciesTable } from '../../../src/components/currencies-table';
 import { recordedCurrency, recordedCurrencySummaries } from '../../support/api/recorded-currencies';
@@ -74,5 +75,12 @@ describe('CurrenciesTable', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Adicionar EUR aos favoritos', pressed: false }));
 
     expect(onToggleFavorite).toHaveBeenCalledWith(recordedCurrency('EUR'));
+  });
+
+  it('should color the percent of the variation by its sign', () => {
+    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={jest.fn()} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
+
+    expect(screen.getByText('+0,81%')).toHaveStyle({ color: createTheme().palette.success.main });
+    expect(screen.getByText('-0,30%')).toHaveStyle({ color: createTheme().palette.error.main });
   });
 });
