@@ -5,6 +5,8 @@ import { recordedCustomsDutiesObservations, recordedUsImportsFromBrazilObservati
 const quotes = recordedUsdQuotes().quotes;
 const SEPTEMBER_2026 = { granularity: 'month', year: 2026, month: 9 } as const;
 const YEAR_2026 = { granularity: 'year', year: 2026 } as const;
+const USD_WINDOW = { granularity: 'window', window: { unit: 'day', length: 90 }, from: '2026-06-28', to: '2026-09-25' } as const;
+const TWENTY_FOUR_MONTHS = { unit: 'month', length: 24 } as const;
 
 describe('toClosingSeries', () => {
   it('should place the closing of the last business day of each month on a January to December axis when annual', () => {
@@ -27,6 +29,15 @@ describe('toClosingSeries', () => {
     const ask = series.datasets[0]?.values ?? [];
     expect(ask[23]).toBe(5.1795);
     expect(ask[24]).toBe(5.1991);
+    expect(ask.filter((value) => value !== null)).toEqual([5.1795, 5.1991]);
+  });
+
+  it('should place the closing of each day on a day by day axis of the whole window when the selection is a daily window', () => {
+    const series = toClosingSeries(quotes, USD_WINDOW);
+
+    expect(series.labels).toHaveLength(90);
+    const ask = series.datasets[0]?.values ?? [];
+    expect([ask[88], ask[89]]).toEqual([5.1795, 5.1991]);
     expect(ask.filter((value) => value !== null)).toEqual([5.1795, 5.1991]);
   });
 
@@ -63,6 +74,27 @@ describe('toIndicatorSeries', () => {
     const values = series.datasets[0]?.values ?? [];
     expect(values.every((value) => value !== null)).toBe(true);
     expect([values[0], values.at(-1)]).toEqual([3759.060245, 3387.521714]);
+  });
+
+  it('should place each monthly observation of the window on a month by month axis when the selection is a monthly window', () => {
+    const series = toIndicatorSeries(usImports, { granularity: 'window', window: TWENTY_FOUR_MONTHS, from: '2024-08-01', to: '2026-07-31' }, 'Importações');
+
+    const values = series.datasets[0]?.values ?? [];
+    expect(values).toHaveLength(24);
+    expect(values.every((value) => value !== null)).toBe(true);
+    expect([values[0], values.at(-1)]).toEqual([3945.545527, 3387.521714]);
+  });
+
+  it('should show the last eight quarters when the series is quarterly and the selection is its window', () => {
+    const series = toIndicatorSeries(
+      recordedCustomsDutiesObservations().observations,
+      { granularity: 'window', window: TWENTY_FOUR_MONTHS, from: '2024-05-01', to: '2026-04-30' },
+      'Tarifas',
+    );
+
+    const values = series.datasets[0]?.values ?? [];
+    expect(values).toHaveLength(24);
+    expect(values.filter((value) => value !== null)).toEqual([85.865, 87.199, 96.965, 267.681, 331.423, 364.324, 346.15, 326.324]);
   });
 
   it('should leave the months between quarters empty when the series is quarterly', () => {

@@ -35,7 +35,7 @@ describe('App', () => {
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar as cotações');
   });
 
-  it('should open the chart modal on the most recent year when the user clicks the chart button of a currency', async () => {
+  it('should open the chart modal on the 90 days ending at the latest quote when the user clicks the chart button of a currency', async () => {
     const loadCurrencyQuotes = jest.fn<Promise<CurrencyQuotes>, [string, DateRange]>().mockResolvedValue(recordedUsdQuotes());
     const loadCurrencyPeriods = jest.fn<Promise<CurrencyPeriods>, [string]>().mockResolvedValue(recordedUsdPeriods());
     renderApp({ loadCurrencyQuotes, loadCurrencyPeriods });
@@ -44,9 +44,10 @@ describe('App', () => {
 
     expect(await screen.findByRole('dialog', { name: 'USD — Dólar dos Estados Unidos' })).toBeInTheDocument();
     expect(await screen.findByRole('img', { name: 'Gráfico de USD — Dólar dos Estados Unidos' })).toBeInTheDocument();
-    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(12);
+    expect(screen.getByRole('button', { name: '90 dias', pressed: true })).toBeInTheDocument();
+    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(90);
     expect(loadCurrencyPeriods).toHaveBeenCalledWith('USD');
-    expect(loadCurrencyQuotes).toHaveBeenCalledWith('USD', { from: '2026-01-01', to: '2026-12-31' });
+    expect(loadCurrencyQuotes).toHaveBeenCalledWith('USD', { from: '2026-06-28', to: '2026-09-25' });
   });
 
   it('should show in the chart modal the same variation the table shows for the currency', async () => {
@@ -97,7 +98,7 @@ describe('App', () => {
     expect(await screen.findByRole('table', { name: 'Cotações PTAX por moeda' })).toBeInTheDocument();
   });
 
-  it('should open the indicator chart on the most recent year and load the full history when the user picks Histórico', async () => {
+  it('should open the indicator chart on the 24 months ending at the latest observation and load the full history when the user picks Histórico', async () => {
     const loadIndicatorObservations = jest.fn<Promise<IndicatorObservations>, [IndicatorKey, DateRange]>().mockResolvedValue(recordedUsImportsFromBrazilObservations());
     const loadIndicatorPeriods = jest.fn<Promise<IndicatorPeriods>, [IndicatorKey]>().mockResolvedValue(recordedUsImportsFromBrazilPeriods());
     renderApp({ loadIndicatorObservations, loadIndicatorPeriods });
@@ -107,7 +108,9 @@ describe('App', () => {
     expect(await screen.findByRole('dialog', { name: 'Importações dos EUA vindas do Brasil' })).toBeInTheDocument();
     expect(await screen.findByRole('img', { name: 'Gráfico de Importações dos EUA vindas do Brasil' })).toBeInTheDocument();
     expect(loadIndicatorPeriods).toHaveBeenCalledWith({ source: 'fred', code: 'IMP3510' });
-    expect(loadIndicatorObservations).toHaveBeenCalledWith({ source: 'fred', code: 'IMP3510' }, { from: '2026-01-01', to: '2026-12-31' });
+    expect(loadIndicatorObservations).toHaveBeenCalledWith({ source: 'fred', code: 'IMP3510' }, { from: '2024-08-01', to: '2026-07-31' });
+    expect(screen.getByRole('button', { name: '24 meses', pressed: true })).toBeInTheDocument();
+    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(24);
     expect(screen.queryByRole('button', { name: 'Mensal' })).not.toBeInTheDocument();
 
     fireEvent.click(screen.getByRole('button', { name: 'Histórico' }));

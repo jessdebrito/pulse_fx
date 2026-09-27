@@ -29,7 +29,7 @@ import { currencyFavorite, favoriteCurrencies, favoriteIndicators, indicatorFavo
 import { displayNameOf } from './lib/indicators';
 import { currencyLimitations, indicatorLimitations } from './lib/limitations';
 import { CURRENCY_VARIATION_FORMAT, describeVariation, indicatorVariationFormat } from './lib/variation';
-import { rangeOfSelection, type AvailablePeriod, type DateRange, type Granularity, type PeriodSelection } from './lib/periods';
+import { rangeOfSelection, windowSelection, type AvailablePeriod, type DateRange, type Granularity, type PeriodSelection } from './lib/periods';
 import { toClosingSeries, toIndicatorSeries, type TimeSeries } from './lib/series';
 
 export type CurrencyQuotesLoader = (code: string, range: DateRange) => Promise<CurrencyQuotes>;
@@ -253,6 +253,7 @@ function CurrencyChartModal({ currency, loadChartModal, loadCurrencyQuotes, load
       onClose={onClose}
       loadAvailability={loadAvailability}
       loadSeries={loadSeries}
+      defaultWindow={windowSelection('daily', currency.latestQuote?.quoteDate ?? null)}
       variationText={describeVariation(currency.variation, 'daily', CURRENCY_VARIATION_FORMAT)}
       limitations={currencyLimitations()}
     />
@@ -288,6 +289,7 @@ function IndicatorChartModal({ indicator, loadChartModal, loadIndicatorObservati
       loadAvailability={loadAvailability}
       loadSeries={loadSeries}
       granularities={INDICATOR_GRANULARITIES}
+      defaultWindow={windowSelection(indicator.frequency, indicator.latestObservation?.date ?? null)}
       variationText={describeVariation(indicator.variation, indicator.frequency, indicatorVariationFormat(indicator.frequency))}
       limitations={indicatorLimitations(indicator)}
     />

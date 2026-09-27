@@ -4,7 +4,7 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useCallback, useId, useState, type JSX } from 'react';
 import { useAsync, type AsyncState } from '../hooks/use-async';
-import { CALENDAR_GRANULARITIES, defaultSelection, type AvailablePeriod, type Granularity, type PeriodSelection } from '../lib/periods';
+import { CALENDAR_GRANULARITIES, defaultSelection, type AvailablePeriod, type Granularity, type PeriodSelection, type WindowSelection } from '../lib/periods';
 import { hasValues, type TimeSeries } from '../lib/series';
 import { AppModal } from './app-modal';
 import { LineChart } from './line-chart';
@@ -17,6 +17,7 @@ export interface SeriesChartModalProps {
   readonly loadAvailability: () => Promise<readonly AvailablePeriod[]>;
   readonly loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>;
   readonly granularities?: readonly Granularity[];
+  readonly defaultWindow: WindowSelection | null;
   readonly variationText: string;
   readonly limitations: readonly string[];
 }
@@ -25,6 +26,7 @@ interface ChartSettings {
   readonly loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>;
   readonly chartLabel: string;
   readonly granularities: readonly Granularity[];
+  readonly defaultWindow: WindowSelection | null;
 }
 
 const CONTENT_SPACING = 2;
@@ -38,11 +40,12 @@ export function SeriesChartModal({
   loadAvailability,
   loadSeries,
   granularities = CALENDAR_GRANULARITIES,
+  defaultWindow,
   variationText,
   limitations,
 }: SeriesChartModalProps): JSX.Element {
   const availability = useAsync(loadAvailability);
-  const settings: ChartSettings = { loadSeries, chartLabel: `Gráfico de ${title}`, granularities };
+  const settings: ChartSettings = { loadSeries, chartLabel: `Gráfico de ${title}`, granularities, defaultWindow };
   return (
     <AppModal open={open} title={title} onClose={onClose}>
       <Stack spacing={CONTENT_SPACING}>
@@ -62,9 +65,9 @@ interface AvailabilityContentProps {
 function AvailabilityContent({ availability, settings }: AvailabilityContentProps): JSX.Element {
   if (availability.status === 'loading') return <Typography>Carregando gráfico…</Typography>;
   if (availability.status === 'error') return <Alert severity="error">{LOAD_ERROR_MESSAGE}</Alert>;
-  const initialSelection = defaultSelection(availability.data);
-  if (initialSelection === null) return <Typography>Sem dados disponíveis.</Typography>;
-  return <PeriodChart available={availability.data} initialSelection={initialSelection} settings={settings} />;
+  const latestYearSelection = defaultSelection(availability.data);
+  if (latestYearSelection === null) return <Typography>Sem dados disponíveis.</Typography>;
+  return <PeriodChart available={availability.data} initialSelection={settings.defaultWindow ?? latestYearSelection} settings={settings} />;
 }
 
 interface PeriodChartProps {
@@ -80,7 +83,7 @@ function PeriodChart({ available, initialSelection, settings }: PeriodChartProps
   const series = useAsync(load);
   return (
     <Stack spacing={CONTENT_SPACING}>
-      <PeriodPicker available={available} value={selection} onChange={setSelection} granularities={settings.granularities} />
+      <PeriodPicker available={available} value={selection} onChange={setSelection} granularities={settings.granularities} defaultWindow={settings.defaultWindow} />
       <SeriesContent state={series} chartLabel={settings.chartLabel} />
     </Stack>
   );

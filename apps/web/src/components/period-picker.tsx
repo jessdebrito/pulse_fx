@@ -13,10 +13,12 @@ import {
   selectMonth,
   selectYear,
   switchGranularity,
+  windowLabel,
   yearsOf,
   type AvailablePeriod,
   type Granularity,
   type PeriodSelection,
+  type WindowSelection,
 } from '../lib/periods';
 
 export interface PeriodPickerProps {
@@ -24,6 +26,7 @@ export interface PeriodPickerProps {
   readonly value: PeriodSelection;
   readonly onChange: (selection: PeriodSelection) => void;
   readonly granularities?: readonly Granularity[];
+  readonly defaultWindow?: WindowSelection | null;
 }
 
 interface SelectOption {
@@ -41,7 +44,7 @@ const GRANULARITY_LABELS: Readonly<Record<Granularity, string>> = {
   history: 'Histórico',
 };
 
-export function PeriodPicker({ available, value, onChange, granularities = CALENDAR_GRANULARITIES }: PeriodPickerProps): JSX.Element {
+export function PeriodPicker({ available, value, onChange, granularities = CALENDAR_GRANULARITIES, defaultWindow = null }: PeriodPickerProps): JSX.Element {
   return (
     <Stack direction="row" spacing={PICKER_SPACING} sx={PICKER_STYLE}>
       <ToggleButtonGroup
@@ -49,24 +52,26 @@ export function PeriodPicker({ available, value, onChange, granularities = CALEN
         size="small"
         aria-label="Agrupamento"
         value={value.granularity}
-        onChange={(_event, granularity: Granularity | null) => {
-          if (granularity !== null) onChange(switchGranularity(value, granularity, available));
+        onChange={(_event, choice: PeriodSelection['granularity'] | null) => {
+          if (choice === 'window') onChange(defaultWindow ?? value);
+          else if (choice !== null) onChange(switchGranularity(value, choice, available));
         }}
       >
+        {defaultWindow !== null && <ToggleButton value="window">{windowLabel(defaultWindow.window)}</ToggleButton>}
         {granularities.map((granularity) => (
           <ToggleButton key={granularity} value={granularity}>
             {GRANULARITY_LABELS[granularity]}
           </ToggleButton>
         ))}
       </ToggleButtonGroup>
-      {value.granularity !== 'history' && <CalendarSelects available={available} value={value} onChange={onChange} />}
+      {(value.granularity === 'year' || value.granularity === 'month') && <CalendarSelects available={available} value={value} onChange={onChange} />}
     </Stack>
   );
 }
 
 interface CalendarSelectsProps {
   readonly available: readonly AvailablePeriod[];
-  readonly value: Exclude<PeriodSelection, { readonly granularity: 'history' }>;
+  readonly value: Extract<PeriodSelection, { readonly granularity: 'year' | 'month' }>;
   readonly onChange: (selection: PeriodSelection) => void;
 }
 

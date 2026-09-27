@@ -1,6 +1,6 @@
 import type { Quote } from '../api/currencies';
 import type { Observation } from '../api/indicators';
-import { periodAxis, type PeriodSelection } from './periods';
+import { hasDailyAxis, periodAxis, type PeriodSelection } from './periods';
 
 export interface SeriesDataset {
   readonly id: string;
@@ -50,5 +50,5 @@ function lastClosingByKey(quotes: readonly Quote[], selection: PeriodSelection):
 }
 
 function keyOfDate(date: string, selection: PeriodSelection): string {
-  return selection.granularity === 'month' ? date : date.slice(0, MONTH_KEY_LENGTH);
+  return hasDailyAxis(selection) ? date : date.slice(0, MONTH_KEY_LENGTH);
 }

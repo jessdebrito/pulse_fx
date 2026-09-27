@@ -6,6 +6,8 @@ import { recordedUsImportsFromBrazilPeriods } from '../../support/api/recorded-i
 const available = recordedUsdPeriodsAcrossYears().periods;
 const indicatorPeriods = recordedUsImportsFromBrazilPeriods().periods;
 const INDICATOR_GRANULARITIES = ['year', 'history'] as const;
+const USD_WINDOW = { granularity: 'window', window: { unit: 'day', length: 90 }, from: '2026-06-28', to: '2026-09-25' } as const;
+const US_IMPORTS_WINDOW = { granularity: 'window', window: { unit: 'month', length: 24 }, from: '2024-08-01', to: '2026-07-31' } as const;
 
 function choose(comboboxName: string, optionName: string): void {
   fireEvent.mouseDown(screen.getByRole('combobox', { name: comboboxName }));
@@ -89,5 +91,39 @@ describe('PeriodPicker', () => {
 
     expect(screen.getByRole('button', { name: 'Histórico', pressed: true })).toBeInTheDocument();
     expect(screen.queryByRole('combobox', { name: 'Ano' })).not.toBeInTheDocument();
+  });
+
+  it('should put the default window first, named by its length, pressed and without the year list when it is the selection', () => {
+    render(<PeriodPicker available={available} value={USD_WINDOW} onChange={jest.fn()} defaultWindow={USD_WINDOW} />);
+
+    expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual(['90 dias', 'Anual', 'Mensal']);
+    expect(screen.getByRole('button', { name: '90 dias', pressed: true })).toBeInTheDocument();
+    expect(screen.queryByRole('combobox', { name: 'Ano' })).not.toBeInTheDocument();
+  });
+
+  it('should go back to the default window when the user clicks it', () => {
+    const onChange = jest.fn();
+    render(
+      <PeriodPicker available={indicatorPeriods} value={{ granularity: 'year', year: 2025 }} onChange={onChange} granularities={INDICATOR_GRANULARITIES} defaultWindow={US_IMPORTS_WINDOW} />,
+    );
+
+    fireEvent.click(screen.getByRole('button', { name: '24 meses' }));
+
+    expect(onChange).toHaveBeenCalledWith(US_IMPORTS_WINDOW);
+  });
+
+  it('should switch from the default window to the year where it ends when the user clicks Anual', () => {
+    const onChange = jest.fn();
+    render(<PeriodPicker available={available} value={USD_WINDOW} onChange={onChange} defaultWindow={USD_WINDOW} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Anual' }));
+
+    expect(onChange).toHaveBeenCalledWith({ granularity: 'year', year: 2026 });
+  });
+
+  it('should offer no window toggle when there is no default window', () => {
+    render(<PeriodPicker available={available} value={{ granularity: 'year', year: 2026 }} onChange={jest.fn()} defaultWindow={null} />);
+
+    expect(screen.getAllByRole('button').map((button) => button.textContent)).toEqual(['Anual', 'Mensal']);
   });
 });

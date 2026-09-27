@@ -1,12 +1,16 @@
 import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { SeriesChartModal } from '../../../src/components/series-chart-modal';
-import type { AvailablePeriod, PeriodSelection } from '../../../src/lib/periods';
+import type { AvailablePeriod, PeriodSelection, WindowSelection } from '../../../src/lib/periods';
 import { toClosingSeries, toIndicatorSeries, type TimeSeries } from '../../../src/lib/series';
 import { recordedUsdPeriods, recordedUsdQuotes } from '../../support/api/recorded-currencies';
 import { recordedUsImportsFromBrazilObservations, recordedUsImportsFromBrazilPeriods } from '../../support/api/recorded-indicators';
 import { createdCharts } from '../../support/mocks/chart-js';
 
-function renderModal(loadAvailability: () => Promise<readonly AvailablePeriod[]>, loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>): void {
+function renderModal(
+  loadAvailability: () => Promise<readonly AvailablePeriod[]>,
+  loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>,
+  defaultWindow: WindowSelection | null = null,
+): void {
   render(
     <SeriesChartModal
       open
@@ -14,6 +18,7 @@ function renderModal(loadAvailability: () => Promise<readonly AvailablePeriod[]>
       onClose={jest.fn()}
       loadAvailability={loadAvailability}
       loadSeries={loadSeries}
+      defaultWindow={defaultWindow}
       variationText={USD_VARIATION_TEXT}
       limitations={PTAX_LIMITATIONS}
     />,
@@ -24,6 +29,8 @@ const PTAX_LIMITATIONS = ['A PTAX é publicada só em dias úteis.', 'O gráfico
 
 const USD_VARIATION_TEXT = 'Variação (5 dias úteis): +0,81% — de 5,1575 em 18/09/2026 para 5,1991 em 25/09/2026';
 
+const USD_WINDOW: WindowSelection = { granularity: 'window', window: { unit: 'day', length: 90 }, from: '2026-06-28', to: '2026-09-25' };
+
 const realAvailability = (): Promise<readonly AvailablePeriod[]> => Promise.resolve(recordedUsdPeriods().periods);
 
 function closingSeriesLoader(): jest.Mock<Promise<TimeSeries>, [PeriodSelection]> {
@@ -31,7 +38,30 @@ function closingSeriesLoader(): jest.Mock<Promise<TimeSeries>, [PeriodSelection]
 }
 
 describe('SeriesChartModal', () => {
-  it('should open in annual mode on the most recent year and draw the months of the year', async () => {
+  it('should open on the default window when the caller gives one and draw one point per day of the window', async () => {
+    const loadSeries = closingSeriesLoader();
+
+    renderModal(realAvailability, loadSeries, USD_WINDOW);
+
+    expect(await screen.findByRole('img', { name: 'Gráfico de USD — Dólar dos Estados Unidos' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: '90 dias', pressed: true })).toBeInTheDocument();
+    expect(loadSeries).toHaveBeenCalledWith(USD_WINDOW);
+    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(90);
+  });
+
+  it('should load the default window again when the user returns to it from another period', async () => {
+    const loadSeries = closingSeriesLoader();
+    renderModal(realAvailability, loadSeries, USD_WINDOW);
+    await screen.findByRole('img', { name: 'Gráfico de USD — Dólar dos Estados Unidos' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Anual' }));
+    await waitFor(() => expect(loadSeries).toHaveBeenLastCalledWith({ granularity: 'year', year: 2026 }));
+    fireEvent.click(screen.getByRole('button', { name: '90 dias' }));
+
+    await waitFor(() => expect(loadSeries).toHaveBeenLastCalledWith(USD_WINDOW));
+  });
+
+  it('should open in annual mode on the most recent year and draw the months of the year when there is no default window', async () => {
     const loadSeries = closingSeriesLoader();
 
     renderModal(realAvailability, loadSeries);
@@ -102,6 +132,7 @@ describe('SeriesChartModal', () => {
         loadAvailability={() => Promise.resolve(recordedUsImportsFromBrazilPeriods().periods)}
         loadSeries={loadSeries}
         granularities={['year', 'history']}
+        defaultWindow={null}
         variationText="Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026"
         limitations={[]}
       />,
