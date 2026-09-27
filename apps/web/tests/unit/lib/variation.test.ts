@@ -1,5 +1,5 @@
 import { formatIndicatorValue, formatQuoteValue, formatReferenceDate } from '../../../src/lib/format';
-import { describeVariation, describeVariationBase, variationBasisLabel, type VariationFormat } from '../../../src/lib/variation';
+import { describeVariation, describeVariationBase, describeVariationPercent, variationBasisLabel, type VariationFormat } from '../../../src/lib/variation';
 import { recordedCurrency } from '../../support/api/recorded-currencies';
 import { recordedIndicator } from '../../support/api/recorded-indicators';
 
@@ -44,5 +44,12 @@ describe('describeVariationBase', () => {
   it('should show the base value and its date as the explicit denominator', () => {
     expect(describeVariationBase(variationOf(recordedCurrency('USD')), CURRENCY_FORMAT)).toBe('vs 5,1575 em 18/09/2026');
     expect(describeVariationBase(variationOf(recordedIndicator('fred', 'IMP3510')), MONTHLY_FORMAT)).toBe('vs 4.034,78 em jul/2025');
+  });
+});
+
+describe('describeVariationPercent', () => {
+  it('should show the percent followed by the period of the rule', () => {
+    expect(describeVariationPercent(variationOf(recordedCurrency('USD')), 'daily')).toBe('+0,81% em 5 dias úteis');
+    expect(describeVariationPercent(variationOf(recordedIndicator('fred', 'IMP3510')), 'monthly')).toBe('-16,04% em 12 meses');
   });
 });

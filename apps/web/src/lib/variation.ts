@@ -36,6 +36,10 @@ export function describeVariation(variation: Variation | null, frequency: Indica
   return `Variação (${basis}): ${formatPercent(variation.percent)} — de ${base} para ${latest}`;
 }
 
+export function describeVariationPercent(variation: Variation, frequency: IndicatorFrequency): string {
+  return `${formatPercent(variation.percent)} em ${variationBasisLabel(variation.rule, frequency)}`;
+}
+
 export function describeVariationBase(variation: Variation, format: VariationFormat): string {
   return `vs ${format.value(variation.baseValue)} em ${format.date(variation.baseDate)}`;
 }

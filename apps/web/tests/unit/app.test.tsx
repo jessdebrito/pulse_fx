@@ -22,11 +22,34 @@ function renderApp(props: Partial<AppProps> = {}): void {
 }
 
 describe('App', () => {
-  it('should show a loading message and then the currencies table when the API answers', async () => {
+  it('should show a loading message and then the currency cards when the API answers', async () => {
     renderApp();
 
     expect(screen.getByText('Carregando cotações…')).toBeInTheDocument();
-    expect(await screen.findByRole('table', { name: 'Cotações PTAX por moeda' })).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: 'Cotações PTAX por moeda' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Cards', pressed: true })).toBeInTheDocument();
+  });
+
+  it('should show the currencies and the indicators in tables when the user picks Tabela', async () => {
+    renderApp();
+    await screen.findByRole('list', { name: 'Comércio EUA' });
+
+    fireEvent.click(screen.getByRole('button', { name: 'Tabela' }));
+
+    expect(screen.getByRole('table', { name: 'Cotações PTAX por moeda' })).toBeInTheDocument();
+    expect(screen.getByRole('table', { name: 'Comércio EUA' })).toBeInTheDocument();
+    expect(screen.queryByRole('list', { name: 'Cotações PTAX por moeda' })).not.toBeInTheDocument();
+  });
+
+  it('should keep only the favorites when the user switches to tables with the switch on', async () => {
+    renderApp();
+    await screen.findByRole('button', { name: 'Remover USD dos favoritos' });
+    await screen.findByRole('list', { name: 'Agro' });
+
+    fireEvent.click(screen.getByLabelText('Mostrar só meus favoritos'));
+    fireEvent.click(screen.getByRole('button', { name: 'Tabela' }));
+
+    expect(within(screen.getByRole('table', { name: 'Cotações PTAX por moeda' })).getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['EUR', 'USD']);
   });
 
   it('should show an error alert when the API fails', async () => {
@@ -50,10 +73,11 @@ describe('App', () => {
     expect(loadCurrencyQuotes).toHaveBeenCalledWith('USD', { from: '2026-06-28', to: '2026-09-25' });
   });
 
-  it('should show in the chart modal the same variation the table shows for the currency', async () => {
+  it('should show in the chart modal the same variation the card shows for the currency', async () => {
     renderApp({ loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()), loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()) });
     const chartButton = await screen.findByRole('button', { name: 'Ver gráfico de USD' });
-    expect(chartButton.closest('tr')).toHaveTextContent('+0,81%vs 5,1575 em 18/09/2026');
+    expect(chartButton.closest('li')).toHaveTextContent('+0,81% em 5 dias úteis');
+    expect(chartButton.closest('li')).toHaveTextContent('vs 5,1575 em 18/09/2026');
 
     fireEvent.click(chartButton);
 
@@ -63,7 +87,7 @@ describe('App', () => {
   it('should load the chart modal code only when the user opens a chart', async () => {
     const loadChartModal = jest.fn<Promise<ChartModalComponent>, []>().mockResolvedValue(SeriesChartModal);
     renderApp({ loadChartModal, loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()), loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()) });
-    await screen.findByRole('table', { name: 'Comércio EUA' });
+    await screen.findByRole('list', { name: 'Comércio EUA' });
 
     expect(loadChartModal).not.toHaveBeenCalled();
 
@@ -87,15 +111,15 @@ describe('App', () => {
 
     expect(screen.getAllByRole('heading', { level: 2 }).map((heading) => heading.textContent)).toEqual(['Câmbio (PTAX)', 'Indicadores']);
     expect(screen.getByText('Carregando indicadores…')).toBeInTheDocument();
-    expect(await screen.findByRole('table', { name: 'Comércio EUA' })).toBeInTheDocument();
-    expect(screen.getByRole('table', { name: 'Brasil' })).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: 'Comércio EUA' })).toBeInTheDocument();
+    expect(screen.getByRole('list', { name: 'Brasil' })).toBeInTheDocument();
   });
 
   it('should keep the currencies and show an error alert for the indicators when only the indicators API fails', async () => {
     renderApp({ loadIndicators: () => Promise.reject(new Error('GET /api/indicators responded with HTTP 500')) });
 
     expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar os indicadores.');
-    expect(await screen.findByRole('table', { name: 'Cotações PTAX por moeda' })).toBeInTheDocument();
+    expect(await screen.findByRole('list', { name: 'Cotações PTAX por moeda' })).toBeInTheDocument();
   });
 
   it('should open the indicator chart on the 24 months ending at the latest observation and load the full history when the user picks Histórico', async () => {
@@ -119,7 +143,7 @@ describe('App', () => {
     expect(screen.getByText('Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026')).toBeInTheDocument();
   });
 
-  it('should mark the favorite rows of both tables with a pressed star', async () => {
+  it('should mark the favorite cards of both sections with a pressed star', async () => {
     renderApp();
 
     expect(await screen.findByRole('button', { name: 'Remover USD dos favoritos', pressed: true })).toBeInTheDocument();
@@ -130,14 +154,14 @@ describe('App', () => {
   it('should show only the favorite currencies and indicators when the user turns on the switch', async () => {
     renderApp();
     await screen.findByRole('button', { name: 'Remover USD dos favoritos' });
-    await screen.findByRole('table', { name: 'Agro' });
+    await screen.findByRole('list', { name: 'Agro' });
 
     fireEvent.click(screen.getByLabelText('Mostrar só meus favoritos'));
 
-    expect(within(screen.getByRole('table', { name: 'Cotações PTAX por moeda' })).getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['EUR', 'USD']);
-    expect(within(screen.getByRole('table', { name: 'Comércio EUA' })).getAllByRole('row')).toHaveLength(2);
-    expect(within(screen.getByRole('table', { name: 'Brasil' })).getAllByRole('row')).toHaveLength(2);
-    expect(screen.queryByRole('table', { name: 'Agro' })).not.toBeInTheDocument();
+    expect(within(screen.getByRole('list', { name: 'Cotações PTAX por moeda' })).getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)).toEqual(['EUR', 'USD']);
+    expect(within(screen.getByRole('list', { name: 'Comércio EUA' })).getAllByRole('listitem')).toHaveLength(1);
+    expect(within(screen.getByRole('list', { name: 'Brasil' })).getAllByRole('listitem')).toHaveLength(1);
+    expect(screen.queryByRole('list', { name: 'Agro' })).not.toBeInTheDocument();
   });
 
   it('should save the favorite and keep the star pressed when the user clicks an empty star', async () => {
@@ -153,7 +177,7 @@ describe('App', () => {
   it('should tell the user when the switch is on and there are no favorites yet', async () => {
     renderApp({ favoritesClient: new InMemoryFavoritesClient() });
     await screen.findByRole('button', { name: 'Adicionar USD aos favoritos' });
-    await screen.findByRole('table', { name: 'Agro' });
+    await screen.findByRole('list', { name: 'Agro' });
 
     fireEvent.click(screen.getByLabelText('Mostrar só meus favoritos'));
 
@@ -189,7 +213,7 @@ describe('App', () => {
   it('should leave space above the title and below the content for the fixed disclaimer', async () => {
     renderApp();
 
-    await screen.findByRole('table', { name: 'Cotações PTAX por moeda' });
+    await screen.findByRole('list', { name: 'Cotações PTAX por moeda' });
     expect(screen.getByRole('main')).toHaveStyle({ paddingTop: '32px', paddingBottom: '96px' });
   });
 
