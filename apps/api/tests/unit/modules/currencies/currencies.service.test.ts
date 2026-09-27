@@ -33,6 +33,10 @@ describe('CurrenciesService.listWithLatestQuote', () => {
         askParity: 1,
       },
       variation: null,
+      trend: [
+        { date: '2026-09-23', value: 5.1414 },
+        { date: '2026-09-24', value: 5.1795 },
+      ],
     });
   });
 
@@ -41,7 +45,7 @@ describe('CurrenciesService.listWithLatestQuote', () => {
 
     const summaries = await service.listWithLatestQuote();
 
-    expect(summaries.find((summary) => summary.code === 'JPY')).toEqual({ code: 'JPY', name: 'Iene', type: 'A', latestQuote: null, variation: null });
+    expect(summaries.find((summary) => summary.code === 'JPY')).toEqual({ code: 'JPY', name: 'Iene', type: 'A', latestQuote: null, variation: null, trend: [] });
   });
 
   it('should compare the latest PTAX closing with the closing five business days before when the currency has enough closings', async () => {
@@ -60,6 +64,20 @@ describe('CurrenciesService.listWithLatestQuote', () => {
       rule: { kind: 'observations', count: 5 },
     });
     expect(usd?.variation?.percent).toBeCloseTo(0.8066, 4);
+  });
+
+  it('should give as trend the closing of each day of the 90 days ending at the latest closing, oldest first', async () => {
+    const currencies = new InMemoryCurrencyRepository();
+    const quotes = new InMemoryCurrencyQuoteRepository();
+    await currencies.upsertMany(await recordedCurrencies('USD'));
+    await quotes.upsertMany('USD', await recordedQuotes('USD', '2025-12-30-to-2026-01-02'));
+    await quotes.upsertMany('USD', await recordedQuotes('USD', '2026-09-01-to-2026-09-25'));
+
+    const [usd] = await new CurrenciesService({ currencies, quotes }).listWithLatestQuote();
+
+    expect(usd?.trend).toHaveLength(18);
+    expect(usd?.trend.every((point) => point.date.startsWith('2026-09'))).toBe(true);
+    expect([usd?.trend[0]?.date, usd?.trend.at(-1)]).toEqual(['2026-09-01', { date: '2026-09-25', value: 5.1991 }]);
   });
 
   it('should have no variation when the currency has fewer than six closings', async () => {

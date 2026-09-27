@@ -88,16 +88,18 @@ export class PrismaCurrencyQuoteRepository implements CurrencyQuoteRepository {
     const rows = await this.prisma.$queryRaw<ClosingRow[]>`
       select currency_code as "currencyCode", quote_date::text as "quoteDate", ask::float8 as ask
       from (
-        select currency_code, quote_date, ask,
-               row_number() over (partition by currency_code order by quote_date desc) as position
-        from (
-          select distinct on (currency_code, quote_date) currency_code, quote_date, ask
-          from currency_quotes
-          where bulletin = 'closing'
-          order by currency_code, quote_date, quoted_at desc
-        ) as daily_closings
-      ) as ranked_closings
-      where position <= ${days}
+        select distinct on (currency_code, quote_date) currency_code, quote_date, ask
+        from currency_quotes
+        where bulletin = 'closing'
+        order by currency_code, quote_date, quoted_at desc
+      ) as daily_closings
+      join (
+        select currency_code as latest_code, max(quote_date) as latest_date
+        from currency_quotes
+        where bulletin = 'closing'
+        group by currency_code
+      ) as latest on latest_code = currency_code
+      where quote_date > latest_date - ${days}::int
       order by currency_code, quote_date`;
     return groupClosings(rows);
   }

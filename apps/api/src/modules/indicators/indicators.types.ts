@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../../shared/calendar-date';
+import type { TrendPointDto } from '../../shared/trend.rules';
 import type { VariationDto } from '../../shared/variation.rules';
 import type { AvailablePeriod } from '../currencies';
 
@@ -30,6 +31,7 @@ export interface ObservationDto {
 export interface IndicatorSummaryDto extends Indicator {
   readonly latestObservation: ObservationDto | null;
   readonly variation: VariationDto | null;
+  readonly trend: TrendPointDto[];
 }
 
 export interface IndicatorObservationsDto extends Indicator {

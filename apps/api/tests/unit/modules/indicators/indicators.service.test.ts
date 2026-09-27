@@ -45,8 +45,23 @@ describe('IndicatorsService.listWithLatestObservation', () => {
         baseValue: 4034.777901,
         rule: { kind: 'months', count: 12 },
       },
+      trend: expect.any(Array) as unknown[],
     });
     expect(summaries.find((summary) => summary.code === '27574')?.latestObservation).toEqual({ date: '2026-08-01', value: 456.24 });
+  });
+
+  it('should give as trend the observations of the 24 months ending at the latest one, oldest first', async () => {
+    const service = await serviceWithRecordedData();
+
+    const summaries = await service.listWithLatestObservation();
+
+    const usImports = summaries.find((summary) => summary.code === 'IMP3510')?.trend ?? [];
+    expect(usImports).toHaveLength(24);
+    expect([usImports[0], usImports.at(-1)]).toEqual([
+      { date: '2024-08-01', value: 3945.545527 },
+      { date: '2026-07-01', value: 3387.521714 },
+    ]);
+    expect(summaries.find((summary) => summary.code === '27574')?.trend.map((point) => point.date)).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
   });
 
   it('should have no variation when the month twelve months before the latest one is not stored', async () => {
@@ -62,7 +77,7 @@ describe('IndicatorsService.listWithLatestObservation', () => {
 
     const summaries = await service.listWithLatestObservation();
 
-    expect(summaries.find((summary) => summary.code === 'EPUTRADE')).toMatchObject({ latestObservation: null, variation: null });
+    expect(summaries.find((summary) => summary.code === 'EPUTRADE')).toMatchObject({ latestObservation: null, variation: null, trend: [] });
   });
 
   it('should return an empty list when the catalog is empty', async () => {

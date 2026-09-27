@@ -5,5 +5,3 @@ export const DAILY_VARIATION_RULE: VariationRule = Object.freeze({ kind: 'observ
 export const WEEKLY_VARIATION_RULE: VariationRule = Object.freeze({ kind: 'observations', count: 4 } as const);
 
 export const YEAR_OVER_YEAR_VARIATION_RULE: VariationRule = Object.freeze({ kind: 'months', count: 12 } as const);
-
-export const VARIATION_WINDOW_MONTHS = 12;

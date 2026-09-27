@@ -67,10 +67,13 @@ export class InMemoryCurrencyQuoteRepository implements CurrencyQuoteRepository 
       const byDay = closingsByCurrency.get(currencyCode) ?? new Map<string, CurrencyQuote>();
       closingsByCurrency.set(currencyCode, byDay.set(quote.quoteDate.toString(), quote));
     }
-    const recent = [...closingsByCurrency.entries()].map(([currencyCode, byDay]): [string, DatedValue[]] => [
-      currencyCode,
-      [...byDay.values()].sort((left, right) => left.quoteDate.toString().localeCompare(right.quoteDate.toString())).slice(-days).map((quote) => ({ date: quote.quoteDate, value: quote.ask })),
-    ]);
+    const recent = [...closingsByCurrency.entries()].map(([currencyCode, byDay]): [string, DatedValue[]] => {
+      const closings = [...byDay.values()].sort((left, right) => left.quoteDate.toString().localeCompare(right.quoteDate.toString()));
+      const latest = closings.at(-1);
+      const start = latest === undefined ? null : latest.quoteDate.addDays(1 - days);
+      const inWindow = closings.filter((quote) => start === null || !quote.quoteDate.isBefore(start));
+      return [currencyCode, inWindow.map((quote) => ({ date: quote.quoteDate, value: quote.ask }))];
+    });
     return Promise.resolve(new Map(recent));
   }
 

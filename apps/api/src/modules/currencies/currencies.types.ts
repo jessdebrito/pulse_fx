@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../../shared/calendar-date';
+import type { TrendPointDto } from '../../shared/trend.rules';
 import type { VariationDto } from '../../shared/variation.rules';
 
 export type CurrencyType = 'A' | 'B';
@@ -37,6 +38,7 @@ export interface CurrencySummaryDto {
   readonly type: CurrencyType;
   readonly latestQuote: QuoteDto | null;
   readonly variation: VariationDto | null;
+  readonly trend: TrendPointDto[];
 }
 
 export interface CurrencyQuotesDto {

@@ -1,6 +1,7 @@
 import type { CalendarDate } from '../../shared/calendar-date';
-import { VARIATION_WINDOW_MONTHS } from '../../shared/variation.constants';
-import { calculateVariation, toVariationDto, type VariationDto } from '../../shared/variation.rules';
+import { TREND_WINDOW_MONTHS } from '../../shared/trend.constants';
+import { toTrendDto } from '../../shared/trend.rules';
+import { calculateVariation, toVariationDto, type DatedValue } from '../../shared/variation.rules';
 import type { IndicatorObservationRepository } from './indicator-observations.repository';
 import { IndicatorNotFoundError } from './indicators.errors';
 import type { IndicatorRepository } from './indicators.repository';
@@ -14,6 +15,8 @@ import type {
   IndicatorSummaryDto,
   ObservationDto,
 } from './indicators.types';
+
+const TREND_MONTHS_BEFORE_LATEST = TREND_WINDOW_MONTHS - 1;
 
 export interface IndicatorsReader {
   listWithLatestObservation(): Promise<IndicatorSummaryDto[]>;
@@ -33,13 +36,17 @@ export class IndicatorsService implements IndicatorsReader {
     const [indicators, latestObservations, recentObservations] = await Promise.all([
       this.dependencies.indicators.findAll(),
       this.dependencies.observations.findLatestPerIndicator(),
-      this.dependencies.observations.findRecentPerIndicator(VARIATION_WINDOW_MONTHS),
+      this.dependencies.observations.findRecentPerIndicator(TREND_MONTHS_BEFORE_LATEST),
     ]);
-    return indicators.map((indicator) => ({
-      ...indicator,
-      latestObservation: toOptionalObservationDto(latestObservations.get(indicatorId(indicator))),
-      variation: variationOf(indicator, recentObservations.get(indicatorId(indicator)) ?? []),
-    }));
+    return indicators.map((indicator) => {
+      const points = pointsOf(recentObservations.get(indicatorId(indicator)) ?? []);
+      return {
+        ...indicator,
+        latestObservation: toOptionalObservationDto(latestObservations.get(indicatorId(indicator))),
+        variation: toVariationDto(calculateVariation(points, variationRuleOf(indicator.frequency))),
+        trend: toTrendDto(points),
+      };
+    });
   }
 
   async getObservations(key: IndicatorKey, from: CalendarDate, to: CalendarDate): Promise<IndicatorObservationsDto> {
@@ -68,7 +75,6 @@ function toOptionalObservationDto(observation: IndicatorObservation | undefined)
   return observation === undefined ? null : toObservationDto(observation);
 }
 
-function variationOf(indicator: Indicator, observations: readonly IndicatorObservation[]): VariationDto | null {
-  const points = observations.map((observation) => ({ date: observation.date, value: Number(observation.value) }));
-  return toVariationDto(calculateVariation(points, variationRuleOf(indicator.frequency)));
+function pointsOf(observations: readonly IndicatorObservation[]): DatedValue[] {
+  return observations.map((observation) => ({ date: observation.date, value: Number(observation.value) }));
 }

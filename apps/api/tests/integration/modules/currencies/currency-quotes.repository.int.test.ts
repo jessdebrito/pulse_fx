@@ -137,11 +137,11 @@ describe('PrismaCurrencyQuoteRepository', () => {
     ]);
   });
 
-  it('should return the closing of each of the most recent days of every currency, oldest first', async () => {
+  it('should return the closing of each day of the last calendar days counted from the latest closing of every currency, oldest first', async () => {
     await repository.upsertMany('USD', await recordedQuotes('USD', '2026-09-01-to-2026-09-25'));
     await repository.upsertMany('EUR', await recordedQuotes('EUR', '2026-09-23-to-2026-09-24'));
 
-    const closings = await repository.findRecentClosings(6);
+    const closings = await repository.findRecentClosings(8);
 
     expect(closings.get('USD')?.map((point) => `${point.date.toString()} ${point.value}`)).toEqual([
       '2026-09-18 5.1575',
@@ -152,6 +152,17 @@ describe('PrismaCurrencyQuoteRepository', () => {
       '2026-09-25 5.1991',
     ]);
     expect(closings.get('EUR')).toHaveLength(2);
+  });
+
+  it('should leave out the closings older than the window of calendar days', async () => {
+    await repository.upsertMany('USD', await recordedQuotes('USD', '2025-12-30-to-2026-01-02'));
+    await repository.upsertMany('USD', await recordedQuotes('USD', '2026-09-01-to-2026-09-25'));
+
+    const closings = await repository.findRecentClosings(90);
+
+    const dates = closings.get('USD')?.map((point) => point.date.toString()) ?? [];
+    expect(dates).toHaveLength(18);
+    expect([dates[0], dates.at(-1)]).toEqual(['2026-09-01', '2026-09-25']);
   });
 
   it('should keep a single closing per day when the BCB published two closings on the same day', async () => {
