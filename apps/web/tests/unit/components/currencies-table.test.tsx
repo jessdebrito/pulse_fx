@@ -20,6 +20,7 @@ describe('CurrenciesTable', () => {
       'Horário',
       'Compra (R$)',
       'Venda (R$)',
+      'Variação',
     ]);
   });
 
@@ -27,14 +28,14 @@ describe('CurrenciesTable', () => {
     render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={jest.fn()} />);
 
     expect(screen.getAllByRole('row')).toHaveLength(11);
-    expect(cellsOfRow('USD')).toEqual(['USD', 'Dólar dos Estados Unidos', 'Fechamento', '25/09/2026 13:10', '5,1985', '5,1991']);
-    expect(cellsOfRow('JPY')).toEqual(['JPY', 'Iene', 'Fechamento', '25/09/2026 13:10', '0,03308', '0,03308']);
+    expect(cellsOfRow('USD')).toEqual(['USD', 'Dólar dos Estados Unidos', 'Fechamento', '25/09/2026 13:10', '5,1985', '5,1991', '+0,81%vs 5,1575 em 18/09/2026']);
+    expect(cellsOfRow('JPY')).toEqual(['JPY', 'Iene', 'Fechamento', '25/09/2026 13:10', '0,03308', '0,03308', '+0,61%vs 0,03288 em 18/09/2026']);
   });
 
   it('should show dashes in the quote columns when a currency has no quote yet', () => {
-    render(<CurrenciesTable currencies={[{ ...recordedCurrency('USD'), latestQuote: null }]} onShowChart={jest.fn()} />);
+    render(<CurrenciesTable currencies={[{ ...recordedCurrency('USD'), latestQuote: null, variation: null }]} onShowChart={jest.fn()} />);
 
-    expect(cellsOfRow('USD')).toEqual(['USD', 'Dólar dos Estados Unidos', '—', '—', '—', '—']);
+    expect(cellsOfRow('USD')).toEqual(['USD', 'Dólar dos Estados Unidos', '—', '—', '—', '—', '—']);
   });
 
   it('should render only the header row when there are no currencies', () => {

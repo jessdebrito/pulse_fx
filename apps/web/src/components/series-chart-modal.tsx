@@ -3,9 +3,8 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import { useCallback, useState, type JSX } from 'react';
 import { useAsync, type AsyncState } from '../hooks/use-async';
-import { formatPercent } from '../lib/format';
 import { CALENDAR_GRANULARITIES, defaultSelection, type AvailablePeriod, type Granularity, type PeriodSelection } from '../lib/periods';
-import { hasValues, variationPercent, type TimeSeries } from '../lib/series';
+import { hasValues, type TimeSeries } from '../lib/series';
 import { AppModal } from './app-modal';
 import { LineChart } from './line-chart';
 import { PeriodPicker } from './period-picker';
@@ -17,6 +16,7 @@ export interface SeriesChartModalProps {
   readonly loadAvailability: () => Promise<readonly AvailablePeriod[]>;
   readonly loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>;
   readonly granularities?: readonly Granularity[];
+  readonly variationText: string;
 }
 
 interface ChartSettings {
@@ -35,12 +35,16 @@ export function SeriesChartModal({
   loadAvailability,
   loadSeries,
   granularities = CALENDAR_GRANULARITIES,
+  variationText,
 }: SeriesChartModalProps): JSX.Element {
   const availability = useAsync(loadAvailability);
   const settings: ChartSettings = { loadSeries, chartLabel: `Gráfico de ${title}`, granularities };
   return (
     <AppModal open={open} title={title} onClose={onClose}>
-      <AvailabilityContent availability={availability} settings={settings} />
+      <Stack spacing={CONTENT_SPACING}>
+        <Typography>{variationText}</Typography>
+        <AvailabilityContent availability={availability} settings={settings} />
+      </Stack>
     </AppModal>
   );
 }
@@ -81,11 +85,5 @@ function SeriesContent({ state, chartLabel }: { readonly state: AsyncState<TimeS
   if (state.status === 'loading') return <Typography>Carregando gráfico…</Typography>;
   if (state.status === 'error') return <Alert severity="error">{LOAD_ERROR_MESSAGE}</Alert>;
   if (!hasValues(state.data)) return <Typography>Sem dados neste período.</Typography>;
-  const variation = variationPercent(state.data.datasets[0]?.values ?? []);
-  return (
-    <>
-      {variation !== null && <Typography>{`Variação no período: ${formatPercent(variation)}`}</Typography>}
-      <LineChart ariaLabel={chartLabel} series={state.data} />
-    </>
-  );
+  return <LineChart ariaLabel={chartLabel} series={state.data} />;
 }

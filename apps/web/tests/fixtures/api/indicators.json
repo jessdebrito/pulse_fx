@@ -8,6 +8,18 @@
     "latestObservation": {
       "date": "2026-04-01",
       "value": 326.324
+    },
+    "variation": {
+      "percent": 21.90779323149571,
+      "absoluteChange": 58.64300000000003,
+      "latestDate": "2026-04-01",
+      "latestValue": 326.324,
+      "baseDate": "2025-04-01",
+      "baseValue": 267.681,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -19,6 +31,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 1248.2368946779902
+    },
+    "variation": {
+      "percent": -62.97838912981071,
+      "absoluteChange": -2123.407032580457,
+      "latestDate": "2026-07-01",
+      "latestValue": 1248.2368946779902,
+      "baseDate": "2025-07-01",
+      "baseValue": 3371.643927258447,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -30,6 +54,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 5442.431145
+    },
+    "variation": {
+      "percent": 23.436335525108586,
+      "absoluteChange": 1033.331408,
+      "latestDate": "2026-07-01",
+      "latestValue": 5442.431145,
+      "baseDate": "2025-07-01",
+      "baseValue": 4409.099737,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -41,6 +77,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 29338.645167
+    },
+    "variation": {
+      "percent": 8.49986839031269,
+      "absoluteChange": 2298.386406999998,
+      "latestDate": "2026-07-01",
+      "latestValue": 29338.645167,
+      "baseDate": "2025-07-01",
+      "baseValue": 27040.25876,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -52,6 +100,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 3387.521714
+    },
+    "variation": {
+      "percent": -16.041928524481623,
+      "absoluteChange": -647.256187,
+      "latestDate": "2026-07-01",
+      "latestValue": 3387.521714,
+      "baseDate": "2025-07-01",
+      "baseValue": 4034.777901,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -63,6 +123,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 33491.12506
+    },
+    "variation": {
+      "percent": 4.023034130605174,
+      "absoluteChange": 1295.2510019999972,
+      "latestDate": "2026-07-01",
+      "latestValue": 33491.12506,
+      "baseDate": "2025-07-01",
+      "baseValue": 32195.874058,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -74,6 +146,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 331.7826086956522
+    },
+    "variation": {
+      "percent": 8.804448563484721,
+      "absoluteChange": 26.84782608695656,
+      "latestDate": "2026-07-01",
+      "latestValue": 331.7826086956522,
+      "baseDate": "2025-07-01",
+      "baseValue": 304.9347826086956,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -85,6 +169,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 359.1622727272727
+    },
+    "variation": {
+      "percent": 13.398542322696965,
+      "absoluteChange": 42.43662055335972,
+      "latestDate": "2026-07-01",
+      "latestValue": 359.1622727272727,
+      "baseDate": "2025-07-01",
+      "baseValue": 316.725652173913,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -96,6 +192,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 131.7799097770027
+    },
+    "variation": {
+      "percent": 4.777548935070568,
+      "absoluteChange": 6.008777395708705,
+      "latestDate": "2026-07-01",
+      "latestValue": 131.7799097770027,
+      "baseDate": "2025-07-01",
+      "baseValue": 125.771132381294,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -107,6 +215,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 101.595652173913
+    },
+    "variation": {
+      "percent": 0.3737113402061644,
+      "absoluteChange": 0.3782608695651959,
+      "latestDate": "2026-07-01",
+      "latestValue": 101.595652173913,
+      "baseDate": "2025-07-01",
+      "baseValue": 101.2173913043478,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -118,6 +238,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 226.1695145629516
+    },
+    "variation": {
+      "percent": 22.742059283868507,
+      "absoluteChange": 41.90544413548392,
+      "latestDate": "2026-07-01",
+      "latestValue": 226.1695145629516,
+      "baseDate": "2025-07-01",
+      "baseValue": 184.2640704274677,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -129,6 +261,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 2.963181818181818
+    },
+    "variation": {
+      "percent": -10.477890689371062,
+      "absoluteChange": -0.34681818181818214,
+      "latestDate": "2026-07-01",
+      "latestValue": 2.963181818181818,
+      "baseDate": "2025-07-01",
+      "baseValue": 3.31,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -140,6 +284,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 198.7038051292526
+    },
+    "variation": {
+      "percent": 20.36330480506884,
+      "absoluteChange": 33.61710744256311,
+      "latestDate": "2026-07-01",
+      "latestValue": 198.7038051292526,
+      "baseDate": "2025-07-01",
+      "baseValue": 165.0866976866895,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -151,6 +307,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 83.73409090909091
+    },
+    "variation": {
+      "percent": 20.36850798499309,
+      "absoluteChange": 14.169308300395258,
+      "latestDate": "2026-07-01",
+      "latestValue": 83.73409090909091,
+      "baseDate": "2025-07-01",
+      "baseValue": 69.56478260869565,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -162,6 +330,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 1.504409090909091
+    },
+    "variation": {
+      "percent": -47.1714048766608,
+      "absoluteChange": -1.3433083003952568,
+      "latestDate": "2026-07-01",
+      "latestValue": 1.504409090909091,
+      "baseDate": "2025-07-01",
+      "baseValue": 2.847717391304348,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -173,6 +353,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 442.4505721529122
+    },
+    "variation": {
+      "percent": 18.059462520077123,
+      "absoluteChange": 67.68131375681429,
+      "latestDate": "2026-07-01",
+      "latestValue": 442.4505721529122,
+      "baseDate": "2025-07-01",
+      "baseValue": 374.7692583960979,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -184,6 +376,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 14.81227272727273
+    },
+    "variation": {
+      "percent": -9.486895845460069,
+      "absoluteChange": -1.5525098814229192,
+      "latestDate": "2026-07-01",
+      "latestValue": 14.81227272727273,
+      "baseDate": "2025-07-01",
+      "baseValue": 16.36478260869565,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -195,6 +399,18 @@
     "latestObservation": {
       "date": "2026-08-01",
       "value": 378.128
+    },
+    "variation": {
+      "percent": 17.900093228028272,
+      "absoluteChange": 57.40899999999999,
+      "latestDate": "2026-08-01",
+      "latestValue": 378.128,
+      "baseDate": "2025-08-01",
+      "baseValue": 320.719,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -206,6 +422,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 6152.2
+    },
+    "variation": {
+      "percent": -3.728972693842425,
+      "absoluteChange": -238.30000000000018,
+      "latestDate": "2026-07-01",
+      "latestValue": 6152.2,
+      "baseDate": "2025-07-01",
+      "baseValue": 6390.5,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -217,6 +445,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 34242.6
+    },
+    "variation": {
+      "percent": 5.7281535411919355,
+      "absoluteChange": 1855.199999999997,
+      "latestDate": "2026-07-01",
+      "latestValue": 34242.6,
+      "baseDate": "2025-07-01",
+      "baseValue": 32387.4,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -228,6 +468,18 @@
     "latestObservation": {
       "date": "2026-07-01",
       "value": 28090.4
+    },
+    "variation": {
+      "percent": 8.052883228384923,
+      "absoluteChange": 2093.5,
+      "latestDate": "2026-07-01",
+      "latestValue": 28090.4,
+      "baseDate": "2025-07-01",
+      "baseValue": 25996.9,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -239,6 +491,18 @@
     "latestObservation": {
       "date": "2026-08-01",
       "value": 456.24
+    },
+    "variation": {
+      "percent": 6.52843933875036,
+      "absoluteChange": 27.960000000000036,
+      "latestDate": "2026-08-01",
+      "latestValue": 456.24,
+      "baseDate": "2025-08-01",
+      "baseValue": 428.28,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -250,6 +514,18 @@
     "latestObservation": {
       "date": "2026-08-01",
       "value": 453.51
+    },
+    "variation": {
+      "percent": -4.395395901846704,
+      "absoluteChange": -20.850000000000023,
+      "latestDate": "2026-08-01",
+      "latestValue": 453.51,
+      "baseDate": "2025-08-01",
+      "baseValue": 474.36,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -261,6 +537,18 @@
     "latestObservation": {
       "date": "2026-08-01",
       "value": 760.21
+    },
+    "variation": {
+      "percent": 41.18750464304286,
+      "absoluteChange": 221.76999999999998,
+      "latestDate": "2026-08-01",
+      "latestValue": 760.21,
+      "baseDate": "2025-08-01",
+      "baseValue": 538.44,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   },
   {
@@ -272,6 +560,18 @@
     "latestObservation": {
       "date": "2026-08-01",
       "value": 195.88
+    },
+    "variation": {
+      "percent": 12.00182972153926,
+      "absoluteChange": 20.99000000000001,
+      "latestDate": "2026-08-01",
+      "latestValue": 195.88,
+      "baseDate": "2025-08-01",
+      "baseValue": 174.89,
+      "rule": {
+        "kind": "months",
+        "count": 12
+      }
     }
   }
 ]

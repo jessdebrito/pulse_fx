@@ -20,6 +20,7 @@ import { useAsync } from './hooks/use-async';
 import { useCurrencies, type CurrenciesLoader, type CurrenciesState } from './hooks/use-currencies';
 import { useIndicators, type IndicatorsLoader, type IndicatorsState } from './hooks/use-indicators';
 import { displayNameOf } from './lib/indicators';
+import { CURRENCY_VARIATION_FORMAT, describeVariation, indicatorVariationFormat } from './lib/variation';
 import { rangeOfSelection, type AvailablePeriod, type DateRange, type Granularity, type PeriodSelection } from './lib/periods';
 import { toClosingSeries, toIndicatorSeries, type TimeSeries } from './lib/series';
 
@@ -191,6 +192,7 @@ function CurrencyChartModal({ currency, loadChartModal, loadCurrencyQuotes, load
       onClose={onClose}
       loadAvailability={loadAvailability}
       loadSeries={loadSeries}
+      variationText={describeVariation(currency.variation, 'daily', CURRENCY_VARIATION_FORMAT)}
     />
   );
 }
@@ -224,6 +226,7 @@ function IndicatorChartModal({ indicator, loadChartModal, loadIndicatorObservati
       loadAvailability={loadAvailability}
       loadSeries={loadSeries}
       granularities={INDICATOR_GRANULARITIES}
+      variationText={describeVariation(indicator.variation, indicator.frequency, indicatorVariationFormat(indicator.frequency))}
     />
   );
 }

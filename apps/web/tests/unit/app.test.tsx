@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { App, type AppProps, type ChartModalComponent } from '../../src/app';
 import { SeriesChartModal } from '../../src/components/series-chart-modal';
 import type { CurrencyPeriods, CurrencyQuotes } from '../../src/api/currencies';
@@ -44,6 +44,16 @@ describe('App', () => {
     expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(12);
     expect(loadCurrencyPeriods).toHaveBeenCalledWith('USD');
     expect(loadCurrencyQuotes).toHaveBeenCalledWith('USD', { from: '2026-01-01', to: '2026-12-31' });
+  });
+
+  it('should show in the chart modal the same variation the table shows for the currency', async () => {
+    renderApp({ loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()), loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()) });
+    const chartButton = await screen.findByRole('button', { name: 'Ver gráfico de USD' });
+    expect(chartButton.closest('tr')).toHaveTextContent('+0,81%vs 5,1575 em 18/09/2026');
+
+    fireEvent.click(chartButton);
+
+    expect(await screen.findByText('Variação (5 dias úteis): +0,81% — de 5,1575 em 18/09/2026 para 5,1991 em 25/09/2026')).toBeInTheDocument();
   });
 
   it('should load the chart modal code only when the user opens a chart', async () => {
@@ -99,7 +109,7 @@ describe('App', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Histórico' }));
 
-    expect(await screen.findByText('Variação no período: -9,88%')).toBeInTheDocument();
-    expect(loadIndicatorObservations).toHaveBeenLastCalledWith({ source: 'fred', code: 'IMP3510' }, { from: '2024-01-01', to: '2026-07-31' });
+    await waitFor(() => expect(loadIndicatorObservations).toHaveBeenLastCalledWith({ source: 'fred', code: 'IMP3510' }, { from: '2024-01-01', to: '2026-07-31' }));
+    expect(screen.getByText('Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026')).toBeInTheDocument();
   });
 });

@@ -13,7 +13,6 @@ export interface TimeSeries {
   readonly datasets: readonly SeriesDataset[];
 }
 
-const PERCENT = 100;
 const MONTH_KEY_LENGTH = 7;
 
 export function toClosingSeries(quotes: readonly Quote[], selection: PeriodSelection): TimeSeries {
@@ -43,14 +42,6 @@ export function toIndicatorSeries(observations: readonly Observation[], selectio
 
 export function hasValues(series: TimeSeries): boolean {
   return series.datasets.some((dataset) => dataset.values.some((value) => value !== null));
-}
-
-export function variationPercent(values: readonly (number | null)[]): number | null {
-  const present = values.filter((value): value is number => value !== null);
-  const first = present[0];
-  const last = present.at(-1);
-  if (present.length < 2 || first === undefined || last === undefined || first === 0) return null;
-  return ((last - first) / first) * PERCENT;
 }
 
 function lastClosingByKey(quotes: readonly Quote[], selection: PeriodSelection): Map<string, Quote> {

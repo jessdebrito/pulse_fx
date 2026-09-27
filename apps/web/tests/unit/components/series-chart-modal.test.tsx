@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { SeriesChartModal } from '../../../src/components/series-chart-modal';
 import type { AvailablePeriod, PeriodSelection } from '../../../src/lib/periods';
 import { toClosingSeries, toIndicatorSeries, type TimeSeries } from '../../../src/lib/series';
@@ -8,9 +8,18 @@ import { createdCharts } from '../../support/mocks/chart-js';
 
 function renderModal(loadAvailability: () => Promise<readonly AvailablePeriod[]>, loadSeries: (selection: PeriodSelection) => Promise<TimeSeries>): void {
   render(
-    <SeriesChartModal open title="USD — Dólar dos Estados Unidos" onClose={jest.fn()} loadAvailability={loadAvailability} loadSeries={loadSeries} />,
+    <SeriesChartModal
+      open
+      title="USD — Dólar dos Estados Unidos"
+      onClose={jest.fn()}
+      loadAvailability={loadAvailability}
+      loadSeries={loadSeries}
+      variationText={USD_VARIATION_TEXT}
+    />,
   );
 }
+
+const USD_VARIATION_TEXT = 'Variação (5 dias úteis): +0,81% — de 5,1575 em 18/09/2026 para 5,1991 em 25/09/2026';
 
 const realAvailability = (): Promise<readonly AvailablePeriod[]> => Promise.resolve(recordedUsdPeriods().periods);
 
@@ -31,16 +40,23 @@ describe('SeriesChartModal', () => {
     expect(createdCharts.at(-1)?.config.data.labels).toEqual(['Jan', 'Fev', 'Mar', 'Abr', 'Mai', 'Jun', 'Jul', 'Ago', 'Set', 'Out', 'Nov', 'Dez']);
   });
 
-  it('should draw the days of the most recent month with its variation when the user switches to monthly', async () => {
+  it('should show the variation given by the caller above the chart instead of recomputing it for the selected period', async () => {
+    renderModal(realAvailability, closingSeriesLoader());
+
+    expect(await screen.findByText(USD_VARIATION_TEXT)).toBeInTheDocument();
+    expect(screen.queryByText(/Variação no período/)).not.toBeInTheDocument();
+  });
+
+  it('should draw the days of the most recent month when the user switches to monthly', async () => {
     const loadSeries = closingSeriesLoader();
     renderModal(realAvailability, loadSeries);
     await screen.findByRole('img', { name: 'Gráfico de USD — Dólar dos Estados Unidos' });
 
     fireEvent.click(screen.getByRole('button', { name: 'Mensal' }));
 
-    expect(await screen.findByText('Variação no período: +0,38%')).toBeInTheDocument();
+    await waitFor(() => expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(30));
     expect(loadSeries).toHaveBeenLastCalledWith({ granularity: 'month', year: 2026, month: 9 });
-    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(30);
+    expect(screen.getByText(USD_VARIATION_TEXT)).toBeInTheDocument();
   });
 
   it('should tell the user and skip the chart when the series has no periods with data', async () => {
@@ -83,14 +99,14 @@ describe('SeriesChartModal', () => {
         loadAvailability={() => Promise.resolve(recordedUsImportsFromBrazilPeriods().periods)}
         loadSeries={loadSeries}
         granularities={['year', 'history']}
+        variationText="Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026"
       />,
     );
     await screen.findByRole('img', { name: 'Gráfico de Importações dos EUA vindas do Brasil' });
 
     fireEvent.click(screen.getByRole('button', { name: 'Histórico' }));
 
-    expect(await screen.findByText('Variação no período: -9,88%')).toBeInTheDocument();
+    await waitFor(() => expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(31));
     expect(loadSeries).toHaveBeenLastCalledWith({ granularity: 'history', from: '2024-01', to: '2026-07' });
-    expect(createdCharts.at(-1)?.config.data.labels).toHaveLength(31);
   });
 });

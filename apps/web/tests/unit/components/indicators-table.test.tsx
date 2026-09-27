@@ -32,6 +32,7 @@ describe('IndicatorsTable', () => {
       'Frequência',
       'Referência',
       'Último valor',
+      'Variação',
       'Unidade',
     ]);
   });
@@ -42,9 +43,9 @@ describe('IndicatorsTable', () => {
     const row = rowOf('Ver gráfico de Importações dos EUA vindas do Brasil');
     expect(within(row).getByRole('rowheader')).toHaveTextContent('Importações dos EUA vindas do Brasil');
     expect(within(row).getByText('U.S. Imports of Goods by Customs Basis from Brazil')).toBeInTheDocument();
-    expect(cellsOf('Ver gráfico de Importações dos EUA vindas do Brasil')).toEqual(['FRED', 'Mensal', 'jul/2026', '3.387,52', 'Millions of Dollars']);
-    expect(cellsOf('Ver gráfico de Tarifas de importação arrecadadas pelos EUA')).toEqual(['FRED', 'Trimestral', '2º tri/2026', '326,32', 'Billions of Dollars']);
-    expect(cellsOf('Ver gráfico de Índice de Commodities Brasil (IC-Br)')).toEqual(['BCB SGS', 'Mensal', 'ago/2026', '456,24', 'Índice']);
+    expect(cellsOf('Ver gráfico de Importações dos EUA vindas do Brasil')).toEqual(['FRED', 'Mensal', 'jul/2026', '3.387,52', '-16,04%vs 4.034,78 em jul/2025', 'Millions of Dollars']);
+    expect(cellsOf('Ver gráfico de Tarifas de importação arrecadadas pelos EUA')).toEqual(['FRED', 'Trimestral', '2º tri/2026', '326,32', '+21,91%vs 267,68 em 2º tri/2025', 'Billions of Dollars']);
+    expect(cellsOf('Ver gráfico de Índice de Commodities Brasil (IC-Br)')).toEqual(['BCB SGS', 'Mensal', 'ago/2026', '456,24', '+6,53%vs 428,28 em ago/2025', 'Índice']);
   });
 
   it('should show only the official name when the indicator has no Portuguese name', () => {
@@ -55,9 +56,9 @@ describe('IndicatorsTable', () => {
   });
 
   it('should show dashes and disable the chart button when the indicator has no observation yet', () => {
-    renderTable([{ ...US_IMPORTS, latestObservation: null }]);
+    renderTable([{ ...US_IMPORTS, latestObservation: null, variation: null }]);
 
-    expect(cellsOf('Ver gráfico de Importações dos EUA vindas do Brasil')).toEqual(['FRED', 'Mensal', '—', '—', 'Millions of Dollars']);
+    expect(cellsOf('Ver gráfico de Importações dos EUA vindas do Brasil')).toEqual(['FRED', 'Mensal', '—', '—', '—', 'Millions of Dollars']);
     expect(screen.getByRole('button', { name: 'Ver gráfico de Importações dos EUA vindas do Brasil' })).toBeDisabled();
   });
 

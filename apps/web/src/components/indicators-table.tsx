@@ -13,6 +13,8 @@ import type { JSX } from 'react';
 import type { IndicatorSummary } from '../api/indicators';
 import { formatIndicatorValue, formatReferenceDate, frequencyLabel, sourceLabel } from '../lib/format';
 import { indicatorLabel } from '../lib/indicators';
+import { indicatorVariationFormat } from '../lib/variation';
+import { VariationCell } from './variation-cell';
 
 export interface IndicatorsTableProps {
   readonly title: string;
@@ -35,6 +37,7 @@ export function IndicatorsTable({ title, indicators, onShowChart }: IndicatorsTa
             <TableCell>Frequência</TableCell>
             <TableCell>Referência</TableCell>
             <TableCell align="right">Último valor</TableCell>
+            <TableCell align="right">Variação</TableCell>
             <TableCell>Unidade</TableCell>
           </TableRow>
         </TableHead>
@@ -78,6 +81,7 @@ function IndicatorRow({ indicator, onShowChart }: IndicatorRowProps): JSX.Elemen
       <TableCell>{frequencyLabel(indicator.frequency)}</TableCell>
       <TableCell>{observation === null ? EMPTY_CELL : formatReferenceDate(observation.date, indicator.frequency)}</TableCell>
       <TableCell align="right">{observation === null ? EMPTY_CELL : formatIndicatorValue(observation.value)}</TableCell>
+      <VariationCell variation={indicator.variation} format={indicatorVariationFormat(indicator.frequency)} />
       <TableCell>{indicator.unit}</TableCell>
     </TableRow>
   );

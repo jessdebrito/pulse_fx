@@ -1,4 +1,4 @@
-import { hasValues, toClosingSeries, toIndicatorSeries, variationPercent } from '../../../src/lib/series';
+import { hasValues, toClosingSeries, toIndicatorSeries } from '../../../src/lib/series';
 import { recordedUsdQuotes } from '../../support/api/recorded-currencies';
 import { recordedCustomsDutiesObservations, recordedUsImportsFromBrazilObservations } from '../../support/api/recorded-indicators';
 
@@ -78,19 +78,5 @@ describe('toIndicatorSeries', () => {
 describe('hasValues', () => {
   it('should be true when at least one point has a value', () => {
     expect(hasValues(toClosingSeries(quotes, YEAR_2026))).toBe(true);
-  });
-});
-
-describe('variationPercent', () => {
-  it('should compare the last value against the first ignoring days without data', () => {
-    expect(variationPercent([null, 5.1795, null, 5.1991, null])).toBeCloseTo(0.3784, 4);
-  });
-
-  it.each([
-    ['no values', []],
-    ['a single value', [null, 5.1991, null]],
-    ['a zero base', [0, 5.1991]],
-  ])('should return null when the series has %s', (_case, values) => {
-    expect(variationPercent(values)).toBeNull();
   });
 });

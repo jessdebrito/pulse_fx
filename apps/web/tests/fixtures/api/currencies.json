@@ -11,6 +11,18 @@
       "ask": 3.6565,
       "bidParity": 0.7032,
       "askParity": 0.7033
+    },
+    "variation": {
+      "percent": -0.29993183367416826,
+      "absoluteChange": -0.01100000000000012,
+      "latestDate": "2026-09-25",
+      "latestValue": 3.6565,
+      "baseDate": "2026-09-18",
+      "baseValue": 3.6675,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -25,6 +37,18 @@
       "ask": 3.6771,
       "bidParity": 1.4139,
       "askParity": 1.4142
+    },
+    "variation": {
+      "percent": -0.12765495138248,
+      "absoluteChange": -0.0047000000000001485,
+      "latestDate": "2026-09-25",
+      "latestValue": 3.6771,
+      "baseDate": "2026-09-18",
+      "baseValue": 3.6818,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -39,6 +63,18 @@
       "ask": 6.2799,
       "bidParity": 0.8279,
       "askParity": 0.8284
+    },
+    "variation": {
+      "percent": 0.3323161476889566,
+      "absoluteChange": 0.020799999999999486,
+      "latestDate": "2026-09-25",
+      "latestValue": 6.2799,
+      "baseDate": "2026-09-18",
+      "baseValue": 6.2591,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -53,6 +89,18 @@
       "ask": 0.7929,
       "bidParity": 6.5569,
       "askParity": 6.5571
+    },
+    "variation": {
+      "percent": 0.2528764698444812,
+      "absoluteChange": 0.0020000000000000018,
+      "latestDate": "2026-09-25",
+      "latestValue": 0.7929,
+      "baseDate": "2026-09-18",
+      "baseValue": 0.7909,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -67,6 +115,18 @@
       "ask": 5.928,
       "bidParity": 1.14,
       "askParity": 1.1402
+    },
+    "variation": {
+      "percent": 0.2604607110239089,
+      "absoluteChange": 0.015399999999999636,
+      "latestDate": "2026-09-25",
+      "latestValue": 5.928,
+      "baseDate": "2026-09-18",
+      "baseValue": 5.9126,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -81,6 +141,18 @@
       "ask": 6.8904,
       "bidParity": 1.3245,
       "askParity": 1.3253
+    },
+    "variation": {
+      "percent": -0.08989937070441449,
+      "absoluteChange": -0.0062000000000006494,
+      "latestDate": "2026-09-25",
+      "latestValue": 6.8904,
+      "baseDate": "2026-09-18",
+      "baseValue": 6.8966,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -95,6 +167,18 @@
       "ask": 0.03308,
       "bidParity": 157.16,
       "askParity": 157.17
+    },
+    "variation": {
+      "percent": 0.6082725060827213,
+      "absoluteChange": 0.0001999999999999988,
+      "latestDate": "2026-09-25",
+      "latestValue": 0.03308,
+      "baseDate": "2026-09-18",
+      "baseValue": 0.03288,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -109,6 +193,18 @@
       "ask": 0.5477,
       "bidParity": 9.4923,
       "askParity": 9.4945
+    },
+    "variation": {
+      "percent": 0.0913742690058379,
+      "absoluteChange": 0.0004999999999999449,
+      "latestDate": "2026-09-25",
+      "latestValue": 0.5477,
+      "baseDate": "2026-09-18",
+      "baseValue": 0.5472,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -123,6 +219,18 @@
       "ask": 0.525,
       "bidParity": 9.9028,
       "askParity": 9.9048
+    },
+    "variation": {
+      "percent": 0.382409177820268,
+      "absoluteChange": 0.0020000000000000018,
+      "latestDate": "2026-09-25",
+      "latestValue": 0.525,
+      "baseDate": "2026-09-18",
+      "baseValue": 0.523,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   },
   {
@@ -137,6 +245,18 @@
       "ask": 5.1991,
       "bidParity": 1,
       "askParity": 1
+    },
+    "variation": {
+      "percent": 0.8065923412506032,
+      "absoluteChange": 0.04159999999999986,
+      "latestDate": "2026-09-25",
+      "latestValue": 5.1991,
+      "baseDate": "2026-09-18",
+      "baseValue": 5.1575,
+      "rule": {
+        "kind": "observations",
+        "count": 5
+      }
     }
   }
 ]

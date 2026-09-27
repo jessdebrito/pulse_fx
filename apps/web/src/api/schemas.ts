@@ -9,3 +9,17 @@ export const availablePeriodsSchema = z.array(
     months: z.array(z.number().int().min(FIRST_MONTH).max(LAST_MONTH)),
   }),
 );
+
+export const variationSchema = z.object({
+  percent: z.number(),
+  absoluteChange: z.number(),
+  latestDate: z.iso.date(),
+  latestValue: z.number(),
+  baseDate: z.iso.date(),
+  baseValue: z.number(),
+  rule: z.object({ kind: z.enum(['observations', 'months']), count: z.number().int().positive() }),
+});
+
+export type Variation = z.infer<typeof variationSchema>;
+
+export type VariationRule = Variation['rule'];

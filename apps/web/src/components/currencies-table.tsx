@@ -11,6 +11,8 @@ import TableRow from '@mui/material/TableRow';
 import type { JSX } from 'react';
 import type { CurrencySummary } from '../api/currencies';
 import { bulletinLabel, formatQuoteTime, formatQuoteValue } from '../lib/format';
+import { CURRENCY_VARIATION_FORMAT } from '../lib/variation';
+import { VariationCell } from './variation-cell';
 
 export interface CurrenciesTableProps {
   readonly currencies: readonly CurrencySummary[];
@@ -33,6 +35,7 @@ export function CurrenciesTable({ currencies, onShowChart }: CurrenciesTableProp
             <TableCell>Horário</TableCell>
             <TableCell align="right">Compra (R$)</TableCell>
             <TableCell align="right">Venda (R$)</TableCell>
+            <TableCell align="right">Variação</TableCell>
           </TableRow>
         </TableHead>
         <TableBody>
@@ -74,6 +77,7 @@ function CurrencyRow({ currency, onShowChart }: CurrencyRowProps): JSX.Element {
       <TableCell>{quote === null ? EMPTY_CELL : formatQuoteTime(quote.quotedAt)}</TableCell>
       <TableCell align="right">{quote === null ? EMPTY_CELL : formatQuoteValue(quote.bid)}</TableCell>
       <TableCell align="right">{quote === null ? EMPTY_CELL : formatQuoteValue(quote.ask)}</TableCell>
+      <VariationCell variation={currency.variation} format={CURRENCY_VARIATION_FORMAT} />
     </TableRow>
   );
 }
