@@ -13,7 +13,7 @@ export function disconnectTestDatabase(client: DatabaseClient): Promise<void> {
 }
 
 export async function resetTestDatabase(client: DatabaseClient): Promise<void> {
-  await client.prisma.$executeRaw`truncate table sync_state, currency_quotes, currencies, indicator_sync_state, indicator_observations, indicators`;
+  await client.prisma.$executeRaw`truncate table favorites, sync_state, currency_quotes, currencies, indicator_sync_state, indicator_observations, indicators`;
 }
 
 export async function insertCurrencies(client: DatabaseClient, currencies: readonly Currency[]): Promise<void> {

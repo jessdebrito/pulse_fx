@@ -3,6 +3,7 @@ import { createApp } from './app';
 import type { AppConfig } from './config/env';
 import { createDatabaseClient, type DatabaseClient } from './database/client';
 import { CurrenciesService, PrismaCurrencyQuoteRepository, PrismaCurrencyRepository } from './modules/currencies';
+import { FavoritesService, PrismaFavoriteRepository } from './modules/favorites';
 import { IndicatorsService, PrismaIndicatorObservationRepository, PrismaIndicatorRepository } from './modules/indicators';
 import { IndicatorSyncService, SyncService } from './modules/sync';
 import { PrismaIndicatorSyncStateRepository } from './modules/sync/indicator-sync-state.repository';
@@ -54,6 +55,7 @@ export function createContainer(config: AppConfig): Container {
     logger,
     currenciesService: new CurrenciesService({ currencies, quotes }),
     indicatorsService: new IndicatorsService({ indicators, observations }),
+    favoritesService: new FavoritesService({ favorites: new PrismaFavoriteRepository(database.prisma), currencies, indicators }),
   });
   return { app, database, syncService, indicatorSyncService, logger };
 }

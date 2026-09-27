@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { createApp } from '../../../../src/app';
 import type { CurrenciesReader } from '../../../../src/modules/currencies';
+import type { FavoritesManager } from '../../../../src/modules/favorites';
 import { IndicatorsService, type IndicatorsReader } from '../../../../src/modules/indicators';
 import { CalendarDate } from '../../../../src/shared/calendar-date';
 import type { AppLogger } from '../../../../src/shared/logger';
@@ -9,6 +10,7 @@ import { recordedSgsIndicator, recordedSgsObservations } from '../../../support/
 import { recordedFredIndicator, recordedFredObservations } from '../../../support/sources/fred/recorded-data';
 
 const silentLogger: AppLogger = { info: jest.fn(), warn: jest.fn(), error: jest.fn() };
+const unusedFavorites: FavoritesManager = { list: jest.fn(), addCurrency: jest.fn(), removeCurrency: jest.fn(), addIndicator: jest.fn(), removeIndicator: jest.fn() };
 const unusedCurrencies: CurrenciesReader = { listWithLatestQuote: jest.fn(), getQuotes: jest.fn(), getAvailablePeriods: jest.fn() };
 
 async function recordedService(): Promise<IndicatorsService> {
@@ -22,7 +24,7 @@ async function recordedService(): Promise<IndicatorsService> {
 }
 
 function appWith(indicatorsService: IndicatorsReader): ReturnType<typeof createApp> {
-  return createApp({ logger: silentLogger, currenciesService: unusedCurrencies, indicatorsService });
+  return createApp({ logger: silentLogger, currenciesService: unusedCurrencies, indicatorsService, favoritesService: unusedFavorites });
 }
 
 describe('GET /api/indicators', () => {

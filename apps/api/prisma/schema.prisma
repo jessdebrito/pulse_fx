@@ -121,3 +121,20 @@ model IndicatorSyncState {
   @@id([source, code])
   @@map("indicator_sync_state")
 }
+
+enum FavoriteKind {
+  currency
+  indicator
+
+  @@map("favorite_kind")
+}
+
+model Favorite {
+  clientId  String       @map("client_id") @db.Uuid
+  kind      FavoriteKind
+  itemKey   String       @map("item_key")
+  createdAt DateTime     @default(now()) @map("created_at") @db.Timestamptz(3)
+
+  @@id([clientId, kind, itemKey])
+  @@map("favorites")
+}
