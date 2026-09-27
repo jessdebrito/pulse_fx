@@ -1,4 +1,4 @@
-import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor, within } from '@testing-library/react';
 import { App, type AppProps, type ChartModalComponent } from '../../src/app';
 import { SeriesChartModal } from '../../src/components/series-chart-modal';
 import type { CurrencyPeriods, CurrencyQuotes } from '../../src/api/currencies';
@@ -6,11 +6,14 @@ import type { IndicatorKey, IndicatorObservations, IndicatorPeriods } from '../.
 import type { DateRange } from '../../src/lib/periods';
 import { recordedCurrencySummaries, recordedUsdPeriods, recordedUsdQuotes } from '../support/api/recorded-currencies';
 import { recordedIndicatorSummaries, recordedUsImportsFromBrazilObservations, recordedUsImportsFromBrazilPeriods } from '../support/api/recorded-indicators';
+import { InMemoryFavoritesClient } from '../support/api/in-memory-favorites-client';
+import { recordedFavorites } from '../support/api/recorded-favorites';
 import { createdCharts } from '../support/mocks/chart-js';
 
-function renderApp(props: AppProps = {}): void {
+function renderApp(props: Partial<AppProps> = {}): void {
   render(
     <App
+      favoritesClient={new InMemoryFavoritesClient(recordedFavorites())}
       loadCurrencies={() => Promise.resolve(recordedCurrencySummaries())}
       loadIndicators={() => Promise.resolve(recordedIndicatorSummaries())}
       {...props}
@@ -111,5 +114,66 @@ describe('App', () => {
 
     await waitFor(() => expect(loadIndicatorObservations).toHaveBeenLastCalledWith({ source: 'fred', code: 'IMP3510' }, { from: '2024-01-01', to: '2026-07-31' }));
     expect(screen.getByText('Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026')).toBeInTheDocument();
+  });
+
+  it('should mark the favorite rows of both tables with a pressed star', async () => {
+    renderApp();
+
+    expect(await screen.findByRole('button', { name: 'Remover USD dos favoritos', pressed: true })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'Adicionar AUD aos favoritos', pressed: false })).toBeInTheDocument();
+    expect(await screen.findByRole('button', { name: 'Remover Importações dos EUA vindas do Brasil dos favoritos', pressed: true })).toBeInTheDocument();
+  });
+
+  it('should show only the favorite currencies and indicators when the user turns on the switch', async () => {
+    renderApp();
+    await screen.findByRole('button', { name: 'Remover USD dos favoritos' });
+    await screen.findByRole('table', { name: 'Agro' });
+
+    fireEvent.click(screen.getByLabelText('Mostrar só meus favoritos'));
+
+    expect(within(screen.getByRole('table', { name: 'Cotações PTAX por moeda' })).getAllByRole('rowheader').map((cell) => cell.textContent)).toEqual(['EUR', 'USD']);
+    expect(within(screen.getByRole('table', { name: 'Comércio EUA' })).getAllByRole('row')).toHaveLength(2);
+    expect(within(screen.getByRole('table', { name: 'Brasil' })).getAllByRole('row')).toHaveLength(2);
+    expect(screen.queryByRole('table', { name: 'Agro' })).not.toBeInTheDocument();
+  });
+
+  it('should save the favorite and keep the star pressed when the user clicks an empty star', async () => {
+    const favoritesClient = new InMemoryFavoritesClient(recordedFavorites());
+    renderApp({ favoritesClient });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Adicionar AUD aos favoritos' }));
+
+    expect(await screen.findByRole('button', { name: 'Remover AUD dos favoritos', pressed: true })).toBeInTheDocument();
+    expect(favoritesClient.added).toEqual([{ kind: 'currency', code: 'AUD' }]);
+  });
+
+  it('should tell the user when the switch is on and there are no favorites yet', async () => {
+    renderApp({ favoritesClient: new InMemoryFavoritesClient() });
+    await screen.findByRole('button', { name: 'Adicionar USD aos favoritos' });
+    await screen.findByRole('table', { name: 'Agro' });
+
+    fireEvent.click(screen.getByLabelText('Mostrar só meus favoritos'));
+
+    expect(screen.getByText('Nenhuma moeda favorita.')).toBeInTheDocument();
+    expect(screen.getByText('Nenhum indicador favorito.')).toBeInTheDocument();
+  });
+
+  it('should warn and restore the star when a favorite cannot be saved', async () => {
+    const favoritesClient = new InMemoryFavoritesClient(recordedFavorites());
+    favoritesClient.failSaves = true;
+    renderApp({ favoritesClient });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Adicionar AUD aos favoritos' }));
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível salvar o favorito.');
+    expect(screen.getByRole('button', { name: 'Adicionar AUD aos favoritos', pressed: false })).toBeInTheDocument();
+  });
+
+  it('should warn when the favorites cannot be loaded', async () => {
+    const favoritesClient = new InMemoryFavoritesClient();
+    favoritesClient.failList = true;
+    renderApp({ favoritesClient });
+
+    expect(await screen.findByRole('alert')).toHaveTextContent('Não foi possível carregar os favoritos.');
   });
 });

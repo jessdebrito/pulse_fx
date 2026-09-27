@@ -12,18 +12,21 @@ import type { JSX } from 'react';
 import type { CurrencySummary } from '../api/currencies';
 import { bulletinLabel, formatQuoteTime, formatQuoteValue } from '../lib/format';
 import { CURRENCY_VARIATION_FORMAT } from '../lib/variation';
+import { FavoriteButton } from './favorite-button';
 import { VariationCell } from './variation-cell';
 
 export interface CurrenciesTableProps {
   readonly currencies: readonly CurrencySummary[];
   readonly onShowChart: (currency: CurrencySummary) => void;
+  readonly isFavorite: (currency: CurrencySummary) => boolean;
+  readonly onToggleFavorite: (currency: CurrencySummary) => void;
 }
 
 const EMPTY_CELL = '—';
 const NAME_CELL_SPACING = 1;
 const NAME_CELL_STYLE = { alignItems: 'center' } as const;
 
-export function CurrenciesTable({ currencies, onShowChart }: CurrenciesTableProps): JSX.Element {
+export function CurrenciesTable({ currencies, onShowChart, isFavorite, onToggleFavorite }: CurrenciesTableProps): JSX.Element {
   return (
     <TableContainer component={Paper}>
       <Table aria-label="Cotações PTAX por moeda" size="small">
@@ -40,7 +43,13 @@ export function CurrenciesTable({ currencies, onShowChart }: CurrenciesTableProp
         </TableHead>
         <TableBody>
           {currencies.map((currency) => (
-            <CurrencyRow key={currency.code} currency={currency} onShowChart={onShowChart} />
+            <CurrencyRow
+              key={currency.code}
+              currency={currency}
+              onShowChart={onShowChart}
+              favorite={isFavorite(currency)}
+              onToggleFavorite={onToggleFavorite}
+            />
           ))}
         </TableBody>
       </Table>
@@ -51,9 +60,11 @@ export function CurrenciesTable({ currencies, onShowChart }: CurrenciesTableProp
 interface CurrencyRowProps {
   readonly currency: CurrencySummary;
   readonly onShowChart: (currency: CurrencySummary) => void;
+  readonly favorite: boolean;
+  readonly onToggleFavorite: (currency: CurrencySummary) => void;
 }
 
-function CurrencyRow({ currency, onShowChart }: CurrencyRowProps): JSX.Element {
+function CurrencyRow({ currency, onShowChart, favorite, onToggleFavorite }: CurrencyRowProps): JSX.Element {
   const quote = currency.latestQuote;
   return (
     <TableRow>
@@ -63,6 +74,7 @@ function CurrencyRow({ currency, onShowChart }: CurrencyRowProps): JSX.Element {
       <TableCell>
         <Stack direction="row" spacing={NAME_CELL_SPACING} sx={NAME_CELL_STYLE}>
           <span>{currency.name}</span>
+          <FavoriteButton name={currency.code} active={favorite} onToggle={() => onToggleFavorite(currency)} />
           <IconButton
             size="small"
             aria-label={`Ver gráfico de ${currency.code}`}

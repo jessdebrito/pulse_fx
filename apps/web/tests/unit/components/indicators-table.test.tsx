@@ -7,8 +7,16 @@ const US_IMPORTS = recordedIndicator('fred', 'IMP3510');
 const CUSTOMS_DUTIES = recordedIndicator('fred', 'B235RC1Q027SBEA');
 const COMMODITIES_INDEX = recordedIndicator('sgs', '27574');
 
-function renderTable(indicators: readonly IndicatorSummary[], onShowChart = jest.fn()): void {
-  render(<IndicatorsTable title="Comércio EUA" indicators={indicators} onShowChart={onShowChart} />);
+function renderTable(indicators: readonly IndicatorSummary[], onShowChart = jest.fn(), onToggleFavorite = jest.fn()): void {
+  render(
+    <IndicatorsTable
+      title="Comércio EUA"
+      indicators={indicators}
+      onShowChart={onShowChart}
+      isFavorite={(indicator) => indicator.code === 'IMP3510'}
+      onToggleFavorite={onToggleFavorite}
+    />,
+  );
 }
 
 function rowOf(chartButtonName: string): HTMLElement {
@@ -69,5 +77,15 @@ describe('IndicatorsTable', () => {
     fireEvent.click(screen.getByRole('button', { name: 'Ver gráfico de Tarifas de importação arrecadadas pelos EUA' }));
 
     expect(onShowChart).toHaveBeenCalledWith(CUSTOMS_DUTIES);
+  });
+
+  it('should show a pressed star on favorite indicators and report the indicator whose star is clicked', () => {
+    const onToggleFavorite = jest.fn();
+    renderTable([US_IMPORTS, CUSTOMS_DUTIES], jest.fn(), onToggleFavorite);
+
+    expect(screen.getByRole('button', { name: 'Remover Importações dos EUA vindas do Brasil dos favoritos', pressed: true })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Adicionar Tarifas de importação arrecadadas pelos EUA aos favoritos', pressed: false }));
+
+    expect(onToggleFavorite).toHaveBeenCalledWith(CUSTOMS_DUTIES);
   });
 });

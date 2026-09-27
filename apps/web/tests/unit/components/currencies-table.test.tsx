@@ -10,7 +10,7 @@ function cellsOfRow(code: string): (string | null)[] {
 
 describe('CurrenciesTable', () => {
   it('should render an accessible table with the column headers when given currencies', () => {
-    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={jest.fn()} />);
+    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={jest.fn()} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
 
     const table = screen.getByRole('table', { name: 'Cotações PTAX por moeda' });
     expect(within(table).getAllByRole('columnheader').map((header) => header.textContent)).toEqual([
@@ -25,7 +25,7 @@ describe('CurrenciesTable', () => {
   });
 
   it('should render one row per currency with the latest quote formatted when quotes exist', () => {
-    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={jest.fn()} />);
+    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={jest.fn()} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
 
     expect(screen.getAllByRole('row')).toHaveLength(11);
     expect(cellsOfRow('USD')).toEqual(['USD', 'Dólar dos Estados Unidos', 'Fechamento', '25/09/2026 13:10', '5,1985', '5,1991', '+0,81%vs 5,1575 em 18/09/2026']);
@@ -33,20 +33,20 @@ describe('CurrenciesTable', () => {
   });
 
   it('should show dashes in the quote columns when a currency has no quote yet', () => {
-    render(<CurrenciesTable currencies={[{ ...recordedCurrency('USD'), latestQuote: null, variation: null }]} onShowChart={jest.fn()} />);
+    render(<CurrenciesTable currencies={[{ ...recordedCurrency('USD'), latestQuote: null, variation: null }]} onShowChart={jest.fn()} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
 
     expect(cellsOfRow('USD')).toEqual(['USD', 'Dólar dos Estados Unidos', '—', '—', '—', '—', '—']);
   });
 
   it('should render only the header row when there are no currencies', () => {
-    render(<CurrenciesTable currencies={[]} onShowChart={jest.fn()} />);
+    render(<CurrenciesTable currencies={[]} onShowChart={jest.fn()} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
 
     expect(screen.getAllByRole('row')).toHaveLength(1);
   });
 
   it('should call onShowChart with the currency when its chart button is clicked', () => {
     const onShowChart = jest.fn();
-    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={onShowChart} />);
+    render(<CurrenciesTable currencies={recordedCurrencySummaries()} onShowChart={onShowChart} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Ver gráfico de USD' }));
 
@@ -54,8 +54,25 @@ describe('CurrenciesTable', () => {
   });
 
   it('should disable the chart button when the currency has no quote yet', () => {
-    render(<CurrenciesTable currencies={[{ ...recordedCurrency('USD'), latestQuote: null }]} onShowChart={jest.fn()} />);
+    render(<CurrenciesTable currencies={[{ ...recordedCurrency('USD'), latestQuote: null }]} onShowChart={jest.fn()} isFavorite={() => false} onToggleFavorite={jest.fn()} />);
 
     expect(screen.getByRole('button', { name: 'Ver gráfico de USD' })).toBeDisabled();
+  });
+
+  it('should show a pressed star on favorite currencies and report the currency whose star is clicked', () => {
+    const onToggleFavorite = jest.fn();
+    render(
+      <CurrenciesTable
+        currencies={recordedCurrencySummaries()}
+        onShowChart={jest.fn()}
+        isFavorite={(currency) => currency.code === 'USD'}
+        onToggleFavorite={onToggleFavorite}
+      />,
+    );
+
+    expect(screen.getByRole('button', { name: 'Remover USD dos favoritos', pressed: true })).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Adicionar EUR aos favoritos', pressed: false }));
+
+    expect(onToggleFavorite).toHaveBeenCalledWith(recordedCurrency('EUR'));
   });
 });

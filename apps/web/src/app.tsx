@@ -1,6 +1,9 @@
 import Alert from '@mui/material/Alert';
 import Box from '@mui/material/Box';
 import Container from '@mui/material/Container';
+import FormControlLabel from '@mui/material/FormControlLabel';
+import Stack from '@mui/material/Stack';
+import Switch from '@mui/material/Switch';
 import Typography from '@mui/material/Typography';
 import { useCallback, useState, type ComponentType, type JSX, type ReactNode } from 'react';
 import { fetchCurrencies, fetchCurrencyPeriods, fetchCurrencyQuotes, type CurrencyPeriods, type CurrencyQuotes, type CurrencySummary } from './api/currencies';
@@ -13,12 +16,15 @@ import {
   type IndicatorPeriods,
   type IndicatorSummary,
 } from './api/indicators';
+import type { FavoritesClient } from './api/favorites';
 import { CurrenciesTable } from './components/currencies-table';
 import { IndicatorGroups } from './components/indicator-groups';
 import type { SeriesChartModalProps } from './components/series-chart-modal';
 import { useAsync } from './hooks/use-async';
 import { useCurrencies, type CurrenciesLoader, type CurrenciesState } from './hooks/use-currencies';
+import { useFavorites, type FavoritesView } from './hooks/use-favorites';
 import { useIndicators, type IndicatorsLoader, type IndicatorsState } from './hooks/use-indicators';
+import { currencyFavorite, favoriteCurrencies, favoriteIndicators, indicatorFavorite } from './lib/favorites';
 import { displayNameOf } from './lib/indicators';
 import { CURRENCY_VARIATION_FORMAT, describeVariation, indicatorVariationFormat } from './lib/variation';
 import { rangeOfSelection, type AvailablePeriod, type DateRange, type Granularity, type PeriodSelection } from './lib/periods';
@@ -37,6 +43,7 @@ export type ChartModalComponent = ComponentType<SeriesChartModalProps>;
 export type ChartModalLoader = () => Promise<ChartModalComponent>;
 
 export interface AppProps {
+  readonly favoritesClient: FavoritesClient;
   readonly loadChartModal?: ChartModalLoader;
   readonly loadCurrencies?: CurrenciesLoader;
   readonly loadCurrencyQuotes?: CurrencyQuotesLoader;
@@ -50,8 +57,15 @@ const INDICATOR_GRANULARITIES: readonly Granularity[] = Object.freeze(['year', '
 
 const loadSeriesChartModal: ChartModalLoader = () => import('./components/series-chart-modal').then((module) => module.SeriesChartModal);
 const SECTION_STYLE = { mb: 4 } as const;
+const FAVORITES_BAR_STYLE = { mb: 2 } as const;
+
+interface FavoriteFilter {
+  readonly view: FavoritesView;
+  readonly onlyFavorites: boolean;
+}
 
 export function App({
+  favoritesClient,
   loadChartModal = loadSeriesChartModal,
   loadCurrencies = fetchCurrencies,
   loadCurrencyQuotes = fetchCurrencyQuotes,
@@ -60,24 +74,43 @@ export function App({
   loadIndicatorObservations = fetchIndicatorObservations,
   loadIndicatorPeriods = fetchIndicatorPeriods,
 }: AppProps): JSX.Element {
+  const favorites = useFavorites(favoritesClient);
+  const [onlyFavorites, setOnlyFavorites] = useState(false);
+  const filter: FavoriteFilter = { view: favorites, onlyFavorites };
   return (
     <Container component="main" maxWidth="lg">
       <Typography variant="h4" component="h1" gutterBottom>
         Pulse FX
       </Typography>
+      <FavoritesBar filter={filter} onChange={setOnlyFavorites} />
       <CurrenciesSection
+        filter={filter}
         loadChartModal={loadChartModal}
         loadCurrencies={loadCurrencies}
         loadCurrencyQuotes={loadCurrencyQuotes}
         loadCurrencyPeriods={loadCurrencyPeriods}
       />
       <IndicatorsSection
+        filter={filter}
         loadChartModal={loadChartModal}
         loadIndicators={loadIndicators}
         loadIndicatorObservations={loadIndicatorObservations}
         loadIndicatorPeriods={loadIndicatorPeriods}
       />
     </Container>
+  );
+}
+
+function FavoritesBar({ filter, onChange }: { readonly filter: FavoriteFilter; readonly onChange: (onlyFavorites: boolean) => void }): JSX.Element {
+  return (
+    <Stack spacing={1} sx={FAVORITES_BAR_STYLE}>
+      <FormControlLabel
+        control={<Switch checked={filter.onlyFavorites} onChange={(event) => onChange(event.target.checked)} />}
+        label="Mostrar só meus favoritos"
+      />
+      {filter.view.status === 'error' && <Alert severity="error">Não foi possível carregar os favoritos.</Alert>}
+      {filter.view.saveFailed && <Alert severity="error">Não foi possível salvar o favorito.</Alert>}
+    </Stack>
   );
 }
 
@@ -93,18 +126,19 @@ function Section({ title, children }: { readonly title: string; readonly childre
 }
 
 interface CurrenciesSectionProps {
+  readonly filter: FavoriteFilter;
   readonly loadChartModal: ChartModalLoader;
   readonly loadCurrencies: CurrenciesLoader;
   readonly loadCurrencyQuotes: CurrencyQuotesLoader;
   readonly loadCurrencyPeriods: CurrencyPeriodsLoader;
 }
 
-function CurrenciesSection({ loadChartModal, loadCurrencies, loadCurrencyQuotes, loadCurrencyPeriods }: CurrenciesSectionProps): JSX.Element {
+function CurrenciesSection({ filter, loadChartModal, loadCurrencies, loadCurrencyQuotes, loadCurrencyPeriods }: CurrenciesSectionProps): JSX.Element {
   const state = useCurrencies(loadCurrencies);
   const [selected, setSelected] = useState<CurrencySummary | null>(null);
   return (
     <Section title="Câmbio (PTAX)">
-      <CurrenciesContent state={state} onShowChart={setSelected} />
+      <CurrenciesContent state={state} filter={filter} onShowChart={setSelected} />
       {selected !== null && (
         <CurrencyChartModal
           currency={selected}
@@ -119,18 +153,19 @@ function CurrenciesSection({ loadChartModal, loadCurrencies, loadCurrencyQuotes,
 }
 
 interface IndicatorsSectionProps {
+  readonly filter: FavoriteFilter;
   readonly loadChartModal: ChartModalLoader;
   readonly loadIndicators: IndicatorsLoader;
   readonly loadIndicatorObservations: IndicatorObservationsLoader;
   readonly loadIndicatorPeriods: IndicatorPeriodsLoader;
 }
 
-function IndicatorsSection({ loadChartModal, loadIndicators, loadIndicatorObservations, loadIndicatorPeriods }: IndicatorsSectionProps): JSX.Element {
+function IndicatorsSection({ filter, loadChartModal, loadIndicators, loadIndicatorObservations, loadIndicatorPeriods }: IndicatorsSectionProps): JSX.Element {
   const state = useIndicators(loadIndicators);
   const [selected, setSelected] = useState<IndicatorSummary | null>(null);
   return (
     <Section title="Indicadores">
-      <IndicatorsContent state={state} onShowChart={setSelected} />
+      <IndicatorsContent state={state} filter={filter} onShowChart={setSelected} />
       {selected !== null && (
         <IndicatorChartModal
           indicator={selected}
@@ -146,24 +181,44 @@ function IndicatorsSection({ loadChartModal, loadIndicators, loadIndicatorObserv
 
 interface CurrenciesContentProps {
   readonly state: CurrenciesState;
+  readonly filter: FavoriteFilter;
   readonly onShowChart: (currency: CurrencySummary) => void;
 }
 
-function CurrenciesContent({ state, onShowChart }: CurrenciesContentProps): JSX.Element {
+function CurrenciesContent({ state, filter, onShowChart }: CurrenciesContentProps): JSX.Element {
   if (state.status === 'loading') return <Typography>Carregando cotações…</Typography>;
   if (state.status === 'error') return <Alert severity="error">Não foi possível carregar as cotações.</Alert>;
-  return <CurrenciesTable currencies={state.currencies} onShowChart={onShowChart} />;
+  const currencies = filter.onlyFavorites ? favoriteCurrencies(state.currencies, filter.view.favorites) : state.currencies;
+  if (currencies.length === 0 && filter.onlyFavorites) return <Typography>Nenhuma moeda favorita.</Typography>;
+  return (
+    <CurrenciesTable
+      currencies={currencies}
+      onShowChart={onShowChart}
+      isFavorite={(currency) => filter.view.isFavorite(currencyFavorite(currency))}
+      onToggleFavorite={(currency) => filter.view.toggle(currencyFavorite(currency))}
+    />
+  );
 }
 
 interface IndicatorsContentProps {
   readonly state: IndicatorsState;
+  readonly filter: FavoriteFilter;
   readonly onShowChart: (indicator: IndicatorSummary) => void;
 }
 
-function IndicatorsContent({ state, onShowChart }: IndicatorsContentProps): JSX.Element {
+function IndicatorsContent({ state, filter, onShowChart }: IndicatorsContentProps): JSX.Element {
   if (state.status === 'loading') return <Typography>Carregando indicadores…</Typography>;
   if (state.status === 'error') return <Alert severity="error">Não foi possível carregar os indicadores.</Alert>;
-  return <IndicatorGroups indicators={state.indicators} onShowChart={onShowChart} />;
+  const indicators = filter.onlyFavorites ? favoriteIndicators(state.indicators, filter.view.favorites) : state.indicators;
+  if (indicators.length === 0 && filter.onlyFavorites) return <Typography>Nenhum indicador favorito.</Typography>;
+  return (
+    <IndicatorGroups
+      indicators={indicators}
+      onShowChart={onShowChart}
+      isFavorite={(indicator) => filter.view.isFavorite(indicatorFavorite(indicator))}
+      onToggleFavorite={(indicator) => filter.view.toggle(indicatorFavorite(indicator))}
+    />
+  );
 }
 
 interface CurrencyChartModalProps {

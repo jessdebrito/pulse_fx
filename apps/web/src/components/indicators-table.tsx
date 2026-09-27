@@ -14,19 +14,22 @@ import type { IndicatorSummary } from '../api/indicators';
 import { formatIndicatorValue, formatReferenceDate, frequencyLabel, sourceLabel } from '../lib/format';
 import { indicatorLabel } from '../lib/indicators';
 import { indicatorVariationFormat } from '../lib/variation';
+import { FavoriteButton } from './favorite-button';
 import { VariationCell } from './variation-cell';
 
 export interface IndicatorsTableProps {
   readonly title: string;
   readonly indicators: readonly IndicatorSummary[];
   readonly onShowChart: (indicator: IndicatorSummary) => void;
+  readonly isFavorite: (indicator: IndicatorSummary) => boolean;
+  readonly onToggleFavorite: (indicator: IndicatorSummary) => void;
 }
 
 const EMPTY_CELL = '—';
 const NAME_CELL_SPACING = 1;
 const NAME_CELL_STYLE = { alignItems: 'center', justifyContent: 'space-between' } as const;
 
-export function IndicatorsTable({ title, indicators, onShowChart }: IndicatorsTableProps): JSX.Element {
+export function IndicatorsTable({ title, indicators, onShowChart, isFavorite, onToggleFavorite }: IndicatorsTableProps): JSX.Element {
   return (
     <TableContainer component={Paper}>
       <Table aria-label={title} size="small">
@@ -43,7 +46,13 @@ export function IndicatorsTable({ title, indicators, onShowChart }: IndicatorsTa
         </TableHead>
         <TableBody>
           {indicators.map((indicator) => (
-            <IndicatorRow key={`${indicator.source}/${indicator.code}`} indicator={indicator} onShowChart={onShowChart} />
+            <IndicatorRow
+              key={`${indicator.source}/${indicator.code}`}
+              indicator={indicator}
+              onShowChart={onShowChart}
+              favorite={isFavorite(indicator)}
+              onToggleFavorite={onToggleFavorite}
+            />
           ))}
         </TableBody>
       </Table>
@@ -54,9 +63,11 @@ export function IndicatorsTable({ title, indicators, onShowChart }: IndicatorsTa
 interface IndicatorRowProps {
   readonly indicator: IndicatorSummary;
   readonly onShowChart: (indicator: IndicatorSummary) => void;
+  readonly favorite: boolean;
+  readonly onToggleFavorite: (indicator: IndicatorSummary) => void;
 }
 
-function IndicatorRow({ indicator, onShowChart }: IndicatorRowProps): JSX.Element {
+function IndicatorRow({ indicator, onShowChart, favorite, onToggleFavorite }: IndicatorRowProps): JSX.Element {
   const label = indicatorLabel(indicator);
   const displayName = label ?? indicator.name;
   const observation = indicator.latestObservation;
@@ -72,9 +83,12 @@ function IndicatorRow({ indicator, onShowChart }: IndicatorRowProps): JSX.Elemen
               </Typography>
             )}
           </Stack>
-          <IconButton size="small" aria-label={`Ver gráfico de ${displayName}`} disabled={observation === null} onClick={() => onShowChart(indicator)}>
-            <ShowChartIcon fontSize="small" />
-          </IconButton>
+          <Stack direction="row">
+            <FavoriteButton name={displayName} active={favorite} onToggle={() => onToggleFavorite(indicator)} />
+            <IconButton size="small" aria-label={`Ver gráfico de ${displayName}`} disabled={observation === null} onClick={() => onShowChart(indicator)}>
+              <ShowChartIcon fontSize="small" />
+            </IconButton>
+          </Stack>
         </Stack>
       </TableCell>
       <TableCell>{sourceLabel(indicator.source)}</TableCell>

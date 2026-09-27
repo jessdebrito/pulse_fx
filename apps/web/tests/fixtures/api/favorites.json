@@ -1,0 +1,10 @@
+{
+  "currencies": [
+    "EUR",
+    "USD"
+  ],
+  "indicators": [
+    "fred/IMP3510",
+    "sgs/27574"
+  ]
+}
