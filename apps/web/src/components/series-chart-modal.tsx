@@ -19,6 +19,7 @@ export interface SeriesChartModalProps {
   readonly granularities?: readonly Granularity[];
   readonly defaultWindow: WindowSelection | null;
   readonly variationText: string;
+  readonly reason: string | null;
   readonly limitations: readonly string[];
 }
 
@@ -42,6 +43,7 @@ export function SeriesChartModal({
   granularities = CALENDAR_GRANULARITIES,
   defaultWindow,
   variationText,
+  reason,
   limitations,
 }: SeriesChartModalProps): JSX.Element {
   const availability = useAsync(loadAvailability);
@@ -51,6 +53,7 @@ export function SeriesChartModal({
       <Stack spacing={CONTENT_SPACING}>
         <Typography>{variationText}</Typography>
         <AvailabilityContent availability={availability} settings={settings} />
+        <ReasonSection reason={reason} />
         <LimitationsList limitations={limitations} />
       </Stack>
     </AppModal>
@@ -94,6 +97,19 @@ function SeriesContent({ state, chartLabel }: { readonly state: AsyncState<TimeS
   if (state.status === 'error') return <Alert severity="error">{LOAD_ERROR_MESSAGE}</Alert>;
   if (!hasValues(state.data)) return <Typography>Sem dados neste período.</Typography>;
   return <LineChart ariaLabel={chartLabel} series={state.data} />;
+}
+
+function ReasonSection({ reason }: { readonly reason: string | null }): JSX.Element | null {
+  const headingId = useId();
+  if (reason === null) return null;
+  return (
+    <Box component="section" aria-labelledby={headingId}>
+      <Typography id={headingId} variant="subtitle2" component="h3">
+        Por que acompanhar
+      </Typography>
+      <Typography variant="body2">{reason}</Typography>
+    </Box>
+  );
 }
 
 function LimitationsList({ limitations }: { readonly limitations: readonly string[] }): JSX.Element | null {

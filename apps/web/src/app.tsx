@@ -30,6 +30,7 @@ import { useIndicators, type IndicatorsLoader, type IndicatorsState } from './ho
 import { currencyFavorite, favoriteCurrencies, favoriteIndicators, indicatorFavorite } from './lib/favorites';
 import { displayNameOf } from './lib/indicators';
 import { currencyLimitations, indicatorLimitations } from './lib/limitations';
+import { currencyReason, indicatorReason } from './lib/reasons';
 import { CURRENCY_VARIATION_FORMAT, describeVariation, indicatorVariationFormat } from './lib/variation';
 import { rangeOfSelection, windowSelection, type AvailablePeriod, type DateRange, type Granularity, type PeriodSelection } from './lib/periods';
 import { toClosingSeries, toIndicatorSeries, type TimeSeries } from './lib/series';
@@ -271,6 +272,7 @@ function CurrencyChartModal({ currency, loadChartModal, loadCurrencyQuotes, load
       loadSeries={loadSeries}
       defaultWindow={windowSelection('daily', currency.latestQuote?.quoteDate ?? null)}
       variationText={describeVariation(currency.variation, 'daily', CURRENCY_VARIATION_FORMAT)}
+      reason={currencyReason(currency.code)}
       limitations={currencyLimitations()}
     />
   );
@@ -307,6 +309,7 @@ function IndicatorChartModal({ indicator, loadChartModal, loadIndicatorObservati
       granularities={INDICATOR_GRANULARITIES}
       defaultWindow={windowSelection(indicator.frequency, indicator.latestObservation?.date ?? null)}
       variationText={describeVariation(indicator.variation, indicator.frequency, indicatorVariationFormat(indicator.frequency))}
+      reason={indicatorReason(indicator)}
       limitations={indicatorLimitations(indicator)}
     />
   );

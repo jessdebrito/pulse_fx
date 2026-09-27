@@ -20,10 +20,13 @@ function renderModal(
       loadSeries={loadSeries}
       defaultWindow={defaultWindow}
       variationText={USD_VARIATION_TEXT}
+      reason={USD_REASON}
       limitations={PTAX_LIMITATIONS}
     />,
   );
 }
+
+const USD_REASON = 'A PTAX do dólar é a taxa de referência oficial do BCB.';
 
 const PTAX_LIMITATIONS = ['A PTAX é publicada só em dias úteis.', 'O gráfico usa o fechamento PTAX (venda).'];
 
@@ -134,6 +137,7 @@ describe('SeriesChartModal', () => {
         granularities={['year', 'history']}
         defaultWindow={null}
         variationText="Variação (12 meses): -16,04% — de 4.034,78 em jul/2025 para 3.387,52 em jul/2026"
+        reason={null}
         limitations={[]}
       />,
     );
@@ -150,5 +154,32 @@ describe('SeriesChartModal', () => {
 
     const list = await screen.findByRole('list', { name: 'Observações' });
     expect(within(list).getAllByRole('listitem').map((item) => item.textContent)).toEqual(PTAX_LIMITATIONS);
+  });
+
+  it('should explain why the series is worth following under its own heading before the limitations', async () => {
+    renderModal(realAvailability, closingSeriesLoader());
+
+    const region = await screen.findByRole('region', { name: 'Por que acompanhar' });
+    expect(within(region).getByText(USD_REASON)).toBeInTheDocument();
+    expect(screen.getAllByRole('heading', { level: 3 }).map((heading) => heading.textContent)).toEqual(['Por que acompanhar', 'Observações']);
+  });
+
+  it('should leave out the reason section when the caller has no reason for the series', async () => {
+    render(
+      <SeriesChartModal
+        open
+        title="Série sem justificativa"
+        onClose={jest.fn()}
+        loadAvailability={realAvailability}
+        loadSeries={closingSeriesLoader()}
+        defaultWindow={null}
+        variationText={USD_VARIATION_TEXT}
+        reason={null}
+        limitations={PTAX_LIMITATIONS}
+      />,
+    );
+
+    await screen.findByRole('list', { name: 'Observações' });
+    expect(screen.queryByRole('region', { name: 'Por que acompanhar' })).not.toBeInTheDocument();
   });
 });

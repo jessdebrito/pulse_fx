@@ -217,6 +217,23 @@ describe('App', () => {
     expect(screen.getByRole('main')).toHaveStyle({ paddingTop: '32px', paddingBottom: '96px' });
   });
 
+  it('should explain in the chart modal why the currency and the indicator are worth following', async () => {
+    renderApp({
+      loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()),
+      loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()),
+      loadIndicatorPeriods: () => Promise.resolve(recordedUsImportsFromBrazilPeriods()),
+      loadIndicatorObservations: () => Promise.resolve(recordedUsImportsFromBrazilObservations()),
+    });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Ver gráfico de USD' }));
+    expect(await screen.findByRole('region', { name: 'Por que acompanhar' })).toHaveTextContent(/A PTAX do dólar é a taxa de referência oficial do BCB/);
+    fireEvent.click(screen.getByRole('button', { name: 'Fechar' }));
+    await waitFor(() => expect(screen.queryByRole('dialog')).not.toBeInTheDocument());
+
+    fireEvent.click(screen.getByRole('button', { name: 'Ver gráfico de Importações dos EUA vindas do Brasil' }));
+    expect(await screen.findByRole('region', { name: 'Por que acompanhar' })).toHaveTextContent(/Mede quanto o Brasil vende aos EUA/);
+  });
+
   it('should list the PTAX limitations in the chart modal of a currency', async () => {
     renderApp({ loadCurrencyPeriods: () => Promise.resolve(recordedUsdPeriods()), loadCurrencyQuotes: () => Promise.resolve(recordedUsdQuotes()) });
 
