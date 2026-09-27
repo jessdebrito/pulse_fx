@@ -8,9 +8,11 @@ import Stack from '@mui/material/Stack';
 import Typography from '@mui/material/Typography';
 import type { JSX, ReactNode } from 'react';
 import type { IndicatorFrequency } from '../api/indicators';
-import type { Variation } from '../api/schemas';
+import type { TrendPoint, Variation } from '../api/schemas';
+import { describeTrend } from '../lib/sparkline';
 import { describeVariationBase, describeVariationPercent, type VariationFormat } from '../lib/variation';
 import { FavoriteButton } from './favorite-button';
+import { Sparkline } from './sparkline';
 
 export interface SummaryCardHeading {
   readonly title: string;
@@ -104,6 +106,10 @@ export function SummaryNote({ text }: { readonly text: string }): JSX.Element {
       {text}
     </Typography>
   );
+}
+
+export function SummaryTrend({ trend, format }: { readonly trend: readonly TrendPoint[]; readonly format: VariationFormat }): JSX.Element | null {
+  return <Sparkline values={trend.map((point) => point.value)} label={describeTrend(trend, format)} />;
 }
 
 export function SummaryVariation({ variation, frequency, format }: SummaryVariationProps): JSX.Element {

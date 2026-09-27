@@ -20,6 +20,10 @@ export const variationSchema = z.object({
   rule: z.object({ kind: z.enum(['observations', 'months']), count: z.number().int().positive() }),
 });
 
+export const trendSchema = z.array(z.object({ date: z.iso.date(), value: z.number() }));
+
 export type Variation = z.infer<typeof variationSchema>;
+
+export type TrendPoint = z.infer<typeof trendSchema>[number];
 
 export type VariationRule = Variation['rule'];

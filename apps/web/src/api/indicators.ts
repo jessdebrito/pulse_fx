@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { DateRange } from '../lib/periods';
 import { browserFetch, getJson, type FetchFunction } from './http';
-import { availablePeriodsSchema, variationSchema } from './schemas';
+import { availablePeriodsSchema, trendSchema, variationSchema } from './schemas';
 
 const sourceSchema = z.enum(['fred', 'sgs']);
 
@@ -20,7 +20,7 @@ const indicatorFields = {
   frequency: frequencySchema,
 };
 
-export const indicatorSummarySchema = z.object({ ...indicatorFields, latestObservation: observationSchema.nullable(), variation: variationSchema.nullable() });
+export const indicatorSummarySchema = z.object({ ...indicatorFields, latestObservation: observationSchema.nullable(), variation: variationSchema.nullable(), trend: trendSchema });
 
 export const indicatorObservationsSchema = z.object({ ...indicatorFields, from: z.string(), to: z.string(), observations: z.array(observationSchema) });
 

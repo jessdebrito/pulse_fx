@@ -18,6 +18,7 @@ describe('fetchCurrencies', () => {
 
     expect(currencies).toEqual(recordedCurrencySummaries());
     expect(currencies.find((currency) => currency.code === 'USD')?.latestQuote?.ask).toBe(5.1991);
+    expect(currencies.find((currency) => currency.code === 'USD')?.trend.at(-1)).toEqual({ date: '2026-09-25', value: 5.1991 });
   });
 
   it('should request the currencies route when loading', async () => {

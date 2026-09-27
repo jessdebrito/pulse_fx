@@ -25,6 +25,7 @@ describe('fetchIndicators', () => {
     expect(fetchFunction).toHaveBeenCalledWith('/api/indicators');
     expect(indicators).toEqual(recordedIndicatorSummaries());
     expect(indicators).toHaveLength(25);
+    expect(indicators.find((indicator) => indicator.code === 'IMP3510')?.trend).toHaveLength(24);
   });
 
   it('should throw naming the status when the API responds with an error', async () => {

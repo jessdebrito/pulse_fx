@@ -3,7 +3,7 @@ import type { CurrencySummary, Quote } from '../api/currencies';
 import { bulletinLabel, formatQuoteTime, formatQuoteValue } from '../lib/format';
 import { CURRENCY_VARIATION_FORMAT } from '../lib/variation';
 import type { CurrenciesTableProps } from './currencies-table';
-import { CardGrid, SeriesActions, SummaryCard, SummaryNote, SummaryValue, SummaryVariation } from './summary-card';
+import { CardGrid, SeriesActions, SummaryCard, SummaryNote, SummaryTrend, SummaryValue, SummaryVariation } from './summary-card';
 
 export type CurrencyCardsProps = CurrenciesTableProps;
 
@@ -38,6 +38,7 @@ function CurrencyCard({ currency, favorite, onShowChart, onToggleFavorite }: Cur
   return (
     <SummaryCard heading={{ title: currency.code, subtitle: currency.name, level: 'h3' }} actions={actions}>
       {quote === null ? <SummaryNote text="Sem cotação ainda." /> : <QuoteSummary quote={quote} />}
+      <SummaryTrend trend={currency.trend} format={CURRENCY_VARIATION_FORMAT} />
       <SummaryVariation variation={currency.variation} frequency="daily" format={CURRENCY_VARIATION_FORMAT} />
     </SummaryCard>
   );

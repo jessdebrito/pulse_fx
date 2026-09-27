@@ -72,4 +72,16 @@ describe('CurrencyCards', () => {
 
     expect(onToggleFavorite).toHaveBeenCalledWith(recordedCurrency('EUR'));
   });
+
+  it('should draw the recent trend of the currency with its first and last closing as the description', () => {
+    renderCards(recordedCurrencySummaries());
+
+    expect(within(cardOf('USD')).getByRole('img', { name: 'Evolução: de 5,1717 em 29/06/2026 a 5,1991 em 25/09/2026' })).toBeInTheDocument();
+  });
+
+  it('should draw no trend when the currency has no recent closings', () => {
+    renderCards([{ ...recordedCurrency('USD'), trend: [] }]);
+
+    expect(within(cardOf('USD')).queryByRole('img')).not.toBeInTheDocument();
+  });
 });

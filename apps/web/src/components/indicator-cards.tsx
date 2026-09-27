@@ -4,7 +4,7 @@ import { formatIndicatorValue, formatReferenceDate, frequencyLabel, sourceLabel 
 import { indicatorLabel } from '../lib/indicators';
 import { indicatorVariationFormat } from '../lib/variation';
 import type { IndicatorsTableProps } from './indicators-table';
-import { CardGrid, SeriesActions, SummaryCard, SummaryNote, SummaryValue, SummaryVariation } from './summary-card';
+import { CardGrid, SeriesActions, SummaryCard, SummaryNote, SummaryTrend, SummaryValue, SummaryVariation } from './summary-card';
 
 export type IndicatorCardsProps = IndicatorsTableProps;
 
@@ -35,6 +35,7 @@ function IndicatorCard({ indicator, favorite, onShowChart, onToggleFavorite }: I
   const label = indicatorLabel(indicator);
   const displayName = label ?? indicator.name;
   const observation = indicator.latestObservation;
+  const format = indicatorVariationFormat(indicator.frequency);
   const actions = (
     <SeriesActions
       name={displayName}
@@ -47,7 +48,8 @@ function IndicatorCard({ indicator, favorite, onShowChart, onToggleFavorite }: I
   return (
     <SummaryCard heading={{ title: displayName, subtitle: label === null ? null : indicator.name, level: 'h4' }} actions={actions}>
       {observation === null ? <SummaryNote text="Sem observação ainda." /> : <ObservationSummary indicator={indicator} observation={observation} />}
-      <SummaryVariation variation={indicator.variation} frequency={indicator.frequency} format={indicatorVariationFormat(indicator.frequency)} />
+      <SummaryTrend trend={indicator.trend} format={format} />
+      <SummaryVariation variation={indicator.variation} frequency={indicator.frequency} format={format} />
     </SummaryCard>
   );
 }

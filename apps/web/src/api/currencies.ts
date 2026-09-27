@@ -1,7 +1,7 @@
 import { z } from 'zod';
 import type { DateRange } from '../lib/periods';
 import { browserFetch, getJson, type FetchFunction } from './http';
-import { availablePeriodsSchema, variationSchema } from './schemas';
+import { availablePeriodsSchema, trendSchema, variationSchema } from './schemas';
 
 const quoteSchema = z.object({
   quotedAt: z.string(),
@@ -19,6 +19,7 @@ export const currencySummarySchema = z.object({
   type: z.enum(['A', 'B']),
   latestQuote: quoteSchema.nullable(),
   variation: variationSchema.nullable(),
+  trend: trendSchema,
 });
 
 export const currencyQuotesSchema = z.object({

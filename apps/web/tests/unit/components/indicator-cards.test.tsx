@@ -83,4 +83,16 @@ describe('IndicatorCards', () => {
     expect(onShowChart).toHaveBeenCalledWith(US_IMPORTS);
     expect(onToggleFavorite).toHaveBeenCalledWith(CUSTOMS_DUTIES);
   });
+
+  it('should draw the recent trend of the indicator with its first and last observation as the description', () => {
+    renderCards([US_IMPORTS]);
+
+    expect(within(cardOf('Importações dos EUA vindas do Brasil')).getByRole('img', { name: 'Evolução: de 3.945,55 em ago/2024 a 3.387,52 em jul/2026' })).toBeInTheDocument();
+  });
+
+  it('should draw no trend when the indicator has no recent observations', () => {
+    renderCards([{ ...US_IMPORTS, trend: [] }]);
+
+    expect(within(cardOf('Importações dos EUA vindas do Brasil')).queryByRole('img')).not.toBeInTheDocument();
+  });
 });
