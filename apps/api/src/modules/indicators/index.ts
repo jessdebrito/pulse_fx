@@ -10,7 +10,7 @@ export type {
   ObservationDto,
 } from './indicators.types';
 export { IndicatorNotFoundError } from './indicators.errors';
-export { indicatorId } from './indicators.rules';
+export { indicatorId, variationRuleOf } from './indicators.rules';
 export { PrismaIndicatorRepository, type IndicatorRepository } from './indicators.repository';
 export { PrismaIndicatorObservationRepository, type IndicatorObservationRepository } from './indicator-observations.repository';
 export { IndicatorsService, type IndicatorsReader } from './indicators.service';

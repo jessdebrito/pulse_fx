@@ -32,6 +32,7 @@ describe('CurrenciesService.listWithLatestQuote', () => {
         bidParity: 1,
         askParity: 1,
       },
+      variation: null,
     });
   });
 
@@ -40,7 +41,37 @@ describe('CurrenciesService.listWithLatestQuote', () => {
 
     const summaries = await service.listWithLatestQuote();
 
-    expect(summaries.find((summary) => summary.code === 'JPY')).toEqual({ code: 'JPY', name: 'Iene', type: 'A', latestQuote: null });
+    expect(summaries.find((summary) => summary.code === 'JPY')).toEqual({ code: 'JPY', name: 'Iene', type: 'A', latestQuote: null, variation: null });
+  });
+
+  it('should compare the latest PTAX closing with the closing five business days before when the currency has enough closings', async () => {
+    const currencies = new InMemoryCurrencyRepository();
+    const quotes = new InMemoryCurrencyQuoteRepository();
+    await currencies.upsertMany(await recordedCurrencies('USD'));
+    await quotes.upsertMany('USD', await recordedQuotes('USD', '2026-09-01-to-2026-09-25'));
+
+    const [usd] = await new CurrenciesService({ currencies, quotes }).listWithLatestQuote();
+
+    expect(usd?.variation).toMatchObject({
+      latestDate: '2026-09-25',
+      latestValue: 5.1991,
+      baseDate: '2026-09-18',
+      baseValue: 5.1575,
+      rule: { kind: 'observations', count: 5 },
+    });
+    expect(usd?.variation?.percent).toBeCloseTo(0.8066, 4);
+  });
+
+  it('should have no variation when the currency has fewer than six closings', async () => {
+    const service = await serviceWithRecordedData();
+
+    const summaries = await service.listWithLatestQuote();
+
+    expect(summaries.map((summary) => [summary.code, summary.variation])).toEqual([
+      ['EUR', null],
+      ['JPY', null],
+      ['USD', null],
+    ]);
   });
 
   it('should return an empty list when the catalog is empty', async () => {

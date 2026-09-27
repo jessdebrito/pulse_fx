@@ -36,8 +36,25 @@ describe('IndicatorsService.listWithLatestObservation', () => {
       unit: 'Millions of Dollars',
       frequency: 'monthly',
       latestObservation: { date: '2026-07-01', value: 3387.521714 },
+      variation: {
+        percent: expect.closeTo(-16.0419, 4) as number,
+        absoluteChange: expect.closeTo(-647.256187, 6) as number,
+        latestDate: '2026-07-01',
+        latestValue: 3387.521714,
+        baseDate: '2025-07-01',
+        baseValue: 4034.777901,
+        rule: { kind: 'months', count: 12 },
+      },
     });
     expect(summaries.find((summary) => summary.code === '27574')?.latestObservation).toEqual({ date: '2026-08-01', value: 456.24 });
+  });
+
+  it('should have no variation when the month twelve months before the latest one is not stored', async () => {
+    const service = await serviceWithRecordedData();
+
+    const summaries = await service.listWithLatestObservation();
+
+    expect(summaries.find((summary) => summary.code === '27574')?.variation).toBeNull();
   });
 
   it('should keep the indicator with a null latest observation when it has no observations yet', async () => {
@@ -45,7 +62,7 @@ describe('IndicatorsService.listWithLatestObservation', () => {
 
     const summaries = await service.listWithLatestObservation();
 
-    expect(summaries.find((summary) => summary.code === 'EPUTRADE')?.latestObservation).toBeNull();
+    expect(summaries.find((summary) => summary.code === 'EPUTRADE')).toMatchObject({ latestObservation: null, variation: null });
   });
 
   it('should return an empty list when the catalog is empty', async () => {

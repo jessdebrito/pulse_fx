@@ -136,4 +136,29 @@ describe('PrismaCurrencyQuoteRepository', () => {
       { year: 2025, months: [12] },
     ]);
   });
+
+  it('should return the closing of each of the most recent days of every currency, oldest first', async () => {
+    await repository.upsertMany('USD', await recordedQuotes('USD', '2026-09-01-to-2026-09-25'));
+    await repository.upsertMany('EUR', await recordedQuotes('EUR', '2026-09-23-to-2026-09-24'));
+
+    const closings = await repository.findRecentClosings(6);
+
+    expect(closings.get('USD')?.map((point) => `${point.date.toString()} ${point.value}`)).toEqual([
+      '2026-09-18 5.1575',
+      '2026-09-21 5.1117',
+      '2026-09-22 5.1161',
+      '2026-09-23 5.1414',
+      '2026-09-24 5.1795',
+      '2026-09-25 5.1991',
+    ]);
+    expect(closings.get('EUR')).toHaveLength(2);
+  });
+
+  it('should keep a single closing per day when the BCB published two closings on the same day', async () => {
+    await repository.upsertMany('USD', await recordedQuotes('USD', '2025-04-22-to-2025-04-24'));
+
+    const closings = await repository.findRecentClosings(6);
+
+    expect(closings.get('USD')?.map((point) => `${point.date.toString()} ${point.value}`)).toEqual(['2025-04-22 5.7496', '2025-04-23 5.688', '2025-04-24 5.6738']);
+  });
 });

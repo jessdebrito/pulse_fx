@@ -10,6 +10,7 @@ export interface IndicatorObservationRepository {
   findLatestPerIndicator(): Promise<ReadonlyMap<string, IndicatorObservation>>;
   findBetween(key: IndicatorKey, from: CalendarDate, to: CalendarDate): Promise<IndicatorObservation[]>;
   findAvailablePeriods(key: IndicatorKey): Promise<AvailablePeriod[]>;
+  findRecentPerIndicator(months: number): Promise<ReadonlyMap<string, IndicatorObservation[]>>;
 }
 
 interface ObservationRow {
@@ -62,6 +63,25 @@ export class PrismaIndicatorObservationRepository implements IndicatorObservatio
       where source = ${key.source}::indicator_source and code = ${key.code}
       group by 1
       order by 1 desc`;
+  }
+
+  async findRecentPerIndicator(months: number): Promise<ReadonlyMap<string, IndicatorObservation[]>> {
+    const rows = await this.prisma.$queryRaw<ObservationRow[]>`
+      select ${OBSERVATION_COLUMNS}
+      from indicator_observations
+      join (
+        select source as latest_source, code as latest_code, max(observation_date) as latest_date
+        from indicator_observations
+        group by source, code
+      ) as latest on latest_source = source and latest_code = code
+      where observation_date >= (latest_date - make_interval(months => ${months}::int))::date
+      order by source, code, observation_date`;
+    const recent = new Map<string, IndicatorObservation[]>();
+    for (const row of rows) {
+      const id = indicatorId(row);
+      recent.set(id, [...(recent.get(id) ?? []), toObservation(row)]);
+    }
+    return recent;
   }
 
   private upsertObservation(key: IndicatorKey, observation: IndicatorObservation): ReturnType<Database['indicatorObservation']['upsert']> {

@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../../shared/calendar-date';
+import type { VariationDto } from '../../shared/variation.rules';
 import type { AvailablePeriod } from '../currencies';
 
 export type IndicatorSource = 'fred' | 'sgs';
@@ -28,6 +29,7 @@ export interface ObservationDto {
 
 export interface IndicatorSummaryDto extends Indicator {
   readonly latestObservation: ObservationDto | null;
+  readonly variation: VariationDto | null;
 }
 
 export interface IndicatorObservationsDto extends Indicator {

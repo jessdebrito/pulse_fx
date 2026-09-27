@@ -102,4 +102,19 @@ describe('PrismaIndicatorObservationRepository', () => {
       { year: 2024, months: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12] },
     ]);
   });
+
+  it('should return the observations of the last twelve months of each indicator counted from its latest one, oldest first', async () => {
+    await repository.upsertMany(US_IMPORTS_FROM_BRAZIL, await recordedFredObservations('IMP3510', '2024-01-01-to-2026-09-24'));
+    await repository.upsertMany(BRAZIL_COMMODITIES_INDEX, await recordedSgsObservations('27574', '2026-06-01-to-2026-09-24'));
+
+    const recent = await repository.findRecentPerIndicator(12);
+
+    const usImports = recent.get('fred/IMP3510') ?? [];
+    expect(usImports).toHaveLength(13);
+    expect([usImports[0], usImports.at(-1)]).toEqual([
+      { date: CalendarDate.fromIso('2025-07-01'), value: '4034.777901' },
+      { date: CalendarDate.fromIso('2026-07-01'), value: '3387.521714' },
+    ]);
+    expect(recent.get('sgs/27574')?.map((observation) => observation.date.toString())).toEqual(['2026-06-01', '2026-07-01', '2026-08-01']);
+  });
 });

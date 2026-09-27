@@ -1,4 +1,5 @@
 import type { CalendarDate } from '../../shared/calendar-date';
+import type { VariationDto } from '../../shared/variation.rules';
 
 export type CurrencyType = 'A' | 'B';
 
@@ -35,6 +36,7 @@ export interface CurrencySummaryDto {
   readonly name: string;
   readonly type: CurrencyType;
   readonly latestQuote: QuoteDto | null;
+  readonly variation: VariationDto | null;
 }
 
 export interface CurrencyQuotesDto {

@@ -1,0 +1,133 @@
+{
+  "@odata.context": "https://was-p.bcnet.bcb.gov.br/olinda/servico/PTAX/versao/v1/odata$metadata#_CotacaoMoedaPeriodo(paridadeCompra,paridadeVenda,cotacaoCompra,cotacaoVenda,dataHoraCotacao,tipoBoletim)",
+  "value": [
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.7648,
+      "cotacaoVenda": 5.7654,
+      "dataHoraCotacao": "2025-04-22 10:09:12.489",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.7512,
+      "cotacaoVenda": 5.7518,
+      "dataHoraCotacao": "2025-04-22 11:11:25.624",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.746,
+      "cotacaoVenda": 5.7466,
+      "dataHoraCotacao": "2025-04-22 12:05:26.42",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.7338,
+      "cotacaoVenda": 5.7344,
+      "dataHoraCotacao": "2025-04-22 13:09:35.624",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.749,
+      "cotacaoVenda": 5.7496,
+      "dataHoraCotacao": "2025-04-22 13:09:35.629",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6821,
+      "cotacaoVenda": 5.6827,
+      "dataHoraCotacao": "2025-04-23 10:05:41.35",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6799,
+      "cotacaoVenda": 5.6805,
+      "dataHoraCotacao": "2025-04-23 11:03:25.928",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6905,
+      "cotacaoVenda": 5.6911,
+      "dataHoraCotacao": "2025-04-23 12:05:24.937",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6874,
+      "cotacaoVenda": 5.688,
+      "dataHoraCotacao": "2025-04-23 13:06:30.416",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6971,
+      "cotacaoVenda": 5.6977,
+      "dataHoraCotacao": "2025-04-23 13:06:30.436",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6874,
+      "cotacaoVenda": 5.688,
+      "dataHoraCotacao": "2025-04-23 13:06:30.443",
+      "tipoBoletim": "Fechamento"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6741,
+      "cotacaoVenda": 5.6747,
+      "dataHoraCotacao": "2025-04-24 10:05:27.876",
+      "tipoBoletim": "Abertura"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6787,
+      "cotacaoVenda": 5.6793,
+      "dataHoraCotacao": "2025-04-24 11:11:26.898",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6708,
+      "cotacaoVenda": 5.6714,
+      "dataHoraCotacao": "2025-04-24 12:06:25.576",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6693,
+      "cotacaoVenda": 5.6699,
+      "dataHoraCotacao": "2025-04-24 13:04:29.632",
+      "tipoBoletim": "Intermediário"
+    },
+    {
+      "paridadeCompra": 1.0,
+      "paridadeVenda": 1.0,
+      "cotacaoCompra": 5.6732,
+      "cotacaoVenda": 5.6738,
+      "dataHoraCotacao": "2025-04-24 13:04:29.639",
+      "tipoBoletim": "Fechamento"
+    }
+  ]
+}

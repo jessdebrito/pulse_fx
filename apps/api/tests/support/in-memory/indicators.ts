@@ -69,6 +69,17 @@ export class InMemoryIndicatorObservationRepository implements IndicatorObservat
     return Promise.resolve(periods.sort((left, right) => right.year - left.year));
   }
 
+  findRecentPerIndicator(months: number): Promise<ReadonlyMap<string, IndicatorObservation[]>> {
+    const ids = new Set([...this.rows.values()].map((row) => row.id));
+    const recent = [...ids].map((id): [string, IndicatorObservation[]] => {
+      const observations = [...this.rows.values()].filter((row) => row.id === id).map((row) => row.observation).sort((left, right) => left.date.toString().localeCompare(right.date.toString()));
+      const latest = observations.at(-1);
+      const start = latest === undefined ? null : latest.date.addMonths(-months);
+      return [id, observations.filter((observation) => start === null || !observation.date.isBefore(start))];
+    });
+    return Promise.resolve(new Map(recent));
+  }
+
   observationsOf(key: IndicatorKey): IndicatorObservation[] {
     const id = indicatorId(key);
     return [...this.rows.values()].filter((row) => row.id === id).map((row) => row.observation);

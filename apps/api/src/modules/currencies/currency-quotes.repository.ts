@@ -2,6 +2,7 @@ import type { Database } from '../../database/client';
 import { Prisma } from '../../generated/prisma/client';
 import { CalendarDate } from '../../shared/calendar-date';
 import { APP_TIME_ZONE, APP_UTC_OFFSET } from '../../shared/clock';
+import type { DatedValue } from '../../shared/variation.rules';
 import type { AvailablePeriod, Bulletin, CurrencyQuote } from './currencies.types';
 
 export interface CurrencyQuoteRepository {
@@ -10,6 +11,7 @@ export interface CurrencyQuoteRepository {
   findLatestPerCurrency(): Promise<ReadonlyMap<string, CurrencyQuote>>;
   findByCurrencyBetween(currencyCode: string, from: CalendarDate, to: CalendarDate): Promise<CurrencyQuote[]>;
   findAvailablePeriods(currencyCode: string): Promise<AvailablePeriod[]>;
+  findRecentClosings(days: number): Promise<ReadonlyMap<string, DatedValue[]>>;
 }
 
 interface QuoteRow {
@@ -21,6 +23,12 @@ interface QuoteRow {
   readonly ask: number;
   readonly bidParity: number;
   readonly askParity: number;
+}
+
+interface ClosingRow {
+  readonly currencyCode: string;
+  readonly quoteDate: string;
+  readonly ask: number;
 }
 
 const QUOTE_COLUMNS = Prisma.sql`
@@ -76,6 +84,24 @@ export class PrismaCurrencyQuoteRepository implements CurrencyQuoteRepository {
       order by 1 desc`;
   }
 
+  async findRecentClosings(days: number): Promise<ReadonlyMap<string, DatedValue[]>> {
+    const rows = await this.prisma.$queryRaw<ClosingRow[]>`
+      select currency_code as "currencyCode", quote_date::text as "quoteDate", ask::float8 as ask
+      from (
+        select currency_code, quote_date, ask,
+               row_number() over (partition by currency_code order by quote_date desc) as position
+        from (
+          select distinct on (currency_code, quote_date) currency_code, quote_date, ask
+          from currency_quotes
+          where bulletin = 'closing'
+          order by currency_code, quote_date, quoted_at desc
+        ) as daily_closings
+      ) as ranked_closings
+      where position <= ${days}
+      order by currency_code, quote_date`;
+    return groupClosings(rows);
+  }
+
   private upsertQuote(currencyCode: string, quote: CurrencyQuote): ReturnType<Database['$executeRaw']> {
     return this.prisma.$executeRaw`
       insert into currency_quotes (currency_code, quoted_at, bulletin, quote_date, bid, ask, bid_parity, ask_parity)
@@ -103,4 +129,12 @@ function toCurrencyQuote(row: QuoteRow): CurrencyQuote {
     bidParity: row.bidParity,
     askParity: row.askParity,
   };
+}
+
+function groupClosings(rows: readonly ClosingRow[]): ReadonlyMap<string, DatedValue[]> {
+  const closings = new Map<string, DatedValue[]>();
+  for (const row of rows) {
+    closings.set(row.currencyCode, [...(closings.get(row.currencyCode) ?? []), { date: CalendarDate.fromIso(row.quoteDate), value: row.ask }]);
+  }
+  return closings;
 }

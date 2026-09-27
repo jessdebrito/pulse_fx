@@ -1,8 +1,12 @@
 import type { CurrencyRepository } from './currencies.repository';
 import type { CurrencyQuoteRepository } from './currency-quotes.repository';
 import type { CalendarDate } from '../../shared/calendar-date';
+import { DAILY_VARIATION_RULE } from '../../shared/variation.constants';
+import { calculateVariation, toVariationDto } from '../../shared/variation.rules';
 import { CurrencyNotFoundError } from './currencies.errors';
 import type { Currency, CurrencyPeriodsDto, CurrencyQuote, CurrencyQuotesDto, CurrencySummaryDto, QuoteDto } from './currencies.types';
+
+const CLOSINGS_FOR_VARIATION = DAILY_VARIATION_RULE.count + 1;
 
 export interface CurrenciesReader {
   listWithLatestQuote(): Promise<CurrencySummaryDto[]>;
@@ -19,11 +23,16 @@ export class CurrenciesService implements CurrenciesReader {
   constructor(private readonly dependencies: CurrenciesServiceDependencies) {}
 
   async listWithLatestQuote(): Promise<CurrencySummaryDto[]> {
-    const [currencies, latestQuotes] = await Promise.all([
+    const [currencies, latestQuotes, recentClosings] = await Promise.all([
       this.dependencies.currencies.findAll(),
       this.dependencies.quotes.findLatestPerCurrency(),
+      this.dependencies.quotes.findRecentClosings(CLOSINGS_FOR_VARIATION),
     ]);
-    return currencies.map((currency) => ({ ...currency, latestQuote: toOptionalQuoteDto(latestQuotes.get(currency.code)) }));
+    return currencies.map((currency) => ({
+      ...currency,
+      latestQuote: toOptionalQuoteDto(latestQuotes.get(currency.code)),
+      variation: toVariationDto(calculateVariation(recentClosings.get(currency.code) ?? [], DAILY_VARIATION_RULE)),
+    }));
   }
 
   async getQuotes(currencyCode: string, from: CalendarDate, to: CalendarDate): Promise<CurrencyQuotesDto> {

@@ -1,5 +1,6 @@
 import type { AvailablePeriod, Currency, CurrencyQuote, CurrencyQuoteRepository, CurrencyRepository } from '../../../src/modules/currencies';
 import type { CalendarDate } from '../../../src/shared/calendar-date';
+import type { DatedValue } from '../../../src/shared/variation.rules';
 
 export class InMemoryCurrencyRepository implements CurrencyRepository {
   private readonly items = new Map<string, Currency>();
@@ -56,6 +57,21 @@ export class InMemoryCurrencyQuoteRepository implements CurrencyQuoteRepository 
     }
     const periods = [...monthsByYear.entries()].map(([year, months]) => ({ year, months: [...months].sort((left, right) => left - right) }));
     return Promise.resolve(periods.sort((left, right) => right.year - left.year));
+  }
+
+  findRecentClosings(days: number): Promise<ReadonlyMap<string, DatedValue[]>> {
+    const closingsByCurrency = new Map<string, Map<string, CurrencyQuote>>();
+    const chronological = [...this.rows.values()].sort((left, right) => left.quote.quotedAt.localeCompare(right.quote.quotedAt));
+    for (const { currencyCode, quote } of chronological) {
+      if (quote.bulletin !== 'closing') continue;
+      const byDay = closingsByCurrency.get(currencyCode) ?? new Map<string, CurrencyQuote>();
+      closingsByCurrency.set(currencyCode, byDay.set(quote.quoteDate.toString(), quote));
+    }
+    const recent = [...closingsByCurrency.entries()].map(([currencyCode, byDay]): [string, DatedValue[]] => [
+      currencyCode,
+      [...byDay.values()].sort((left, right) => left.quoteDate.toString().localeCompare(right.quoteDate.toString())).slice(-days).map((quote) => ({ date: quote.quoteDate, value: quote.ask })),
+    ]);
+    return Promise.resolve(new Map(recent));
   }
 
   quotesOf(currencyCode: string): CurrencyQuote[] {

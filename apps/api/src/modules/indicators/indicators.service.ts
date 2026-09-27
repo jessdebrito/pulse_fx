@@ -1,8 +1,10 @@
 import type { CalendarDate } from '../../shared/calendar-date';
+import { VARIATION_WINDOW_MONTHS } from '../../shared/variation.constants';
+import { calculateVariation, toVariationDto, type VariationDto } from '../../shared/variation.rules';
 import type { IndicatorObservationRepository } from './indicator-observations.repository';
 import { IndicatorNotFoundError } from './indicators.errors';
 import type { IndicatorRepository } from './indicators.repository';
-import { indicatorId } from './indicators.rules';
+import { indicatorId, variationRuleOf } from './indicators.rules';
 import type {
   Indicator,
   IndicatorKey,
@@ -28,11 +30,16 @@ export class IndicatorsService implements IndicatorsReader {
   constructor(private readonly dependencies: IndicatorsServiceDependencies) {}
 
   async listWithLatestObservation(): Promise<IndicatorSummaryDto[]> {
-    const [indicators, latestObservations] = await Promise.all([
+    const [indicators, latestObservations, recentObservations] = await Promise.all([
       this.dependencies.indicators.findAll(),
       this.dependencies.observations.findLatestPerIndicator(),
+      this.dependencies.observations.findRecentPerIndicator(VARIATION_WINDOW_MONTHS),
     ]);
-    return indicators.map((indicator) => ({ ...indicator, latestObservation: toOptionalObservationDto(latestObservations.get(indicatorId(indicator))) }));
+    return indicators.map((indicator) => ({
+      ...indicator,
+      latestObservation: toOptionalObservationDto(latestObservations.get(indicatorId(indicator))),
+      variation: variationOf(indicator, recentObservations.get(indicatorId(indicator)) ?? []),
+    }));
   }
 
   async getObservations(key: IndicatorKey, from: CalendarDate, to: CalendarDate): Promise<IndicatorObservationsDto> {
@@ -59,4 +66,9 @@ function toObservationDto(observation: IndicatorObservation): ObservationDto {
 
 function toOptionalObservationDto(observation: IndicatorObservation | undefined): ObservationDto | null {
   return observation === undefined ? null : toObservationDto(observation);
+}
+
+function variationOf(indicator: Indicator, observations: readonly IndicatorObservation[]): VariationDto | null {
+  const points = observations.map((observation) => ({ date: observation.date, value: Number(observation.value) }));
+  return toVariationDto(calculateVariation(points, variationRuleOf(indicator.frequency)));
 }
